@@ -31,7 +31,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = _db_url or Config.SQLALCHEMY_DATABASE_URI
 
     # Base URL for share links
-    BASE_URL = os.environ.get('RAILWAY_PUBLIC_DOMAIN', 'https://mikol.up.railway.app')
+    BASE_URL = os.environ.get('RENDER_EXTERNAL_URL') or os.environ.get('BASE_URL') or 'https://mikol.onrender.com'
 
 
 class TestingConfig(Config):
