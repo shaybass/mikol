@@ -3,6 +3,10 @@ from app import create_app, db
 
 app = create_app(os.environ.get('FLASK_CONFIG') or 'default')
 
+# Auto-create tables on startup
+with app.app_context():
+    db.create_all()
+
 
 @app.cli.command('init-db')
 def init_db():
