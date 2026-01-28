@@ -24,11 +24,14 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Railway provides DATABASE_URL - handle postgres:// vs postgresql://
+
+    # Handle postgres:// vs postgresql:// (Render/Railway compatibility)
     _db_url = os.environ.get('DATABASE_URL', '')
     if _db_url.startswith('postgres://'):
         _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
-    SQLALCHEMY_DATABASE_URI = _db_url or Config.SQLALCHEMY_DATABASE_URI
+
+    # Use SQLite as fallback if no DATABASE_URL
+    SQLALCHEMY_DATABASE_URI = _db_url or 'sqlite:///mikol_prod.db'
 
     # Base URL for share links
     BASE_URL = os.environ.get('RENDER_EXTERNAL_URL') or os.environ.get('BASE_URL') or 'https://mikol.onrender.com'

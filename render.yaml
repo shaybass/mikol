@@ -1,12 +1,6 @@
-databases:
-  - name: mikol-db
-    plan: free
-    databaseName: mikol
-    user: mikol
-
 services:
   - type: web
-    name: mikol
+    name: mikol-app
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
@@ -16,9 +10,5 @@ services:
         value: production
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_URL
-        fromDatabase:
-          name: mikol-db
-          property: connectionString
       - key: PYTHON_VERSION
         value: 3.11.0
