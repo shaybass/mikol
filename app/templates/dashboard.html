@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MIKOL{% endblock %}
+
+{% block content %}
+<!-- Welcome & Stats -->
+<div class="dashboard-header">
+    <div class="dashboard-welcome">
+        <h1 class="page-title">Welcome back, {{ current_user.name }}</h1>
+        <p class="page-subtitle">Your knowledge journey continues</p>
+    </div>
+</div>
+
+<!-- Knowledge Stats -->
+<div class="dashboard-stats">
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon" style="background: rgba(43, 45, 91, 0.1); color: var(--color-primary);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
+        </div>
+        <div class="dashboard-stat-content">
+            <span class="dashboard-stat-value">{{ stats.total_certificates }}</span>
+            <span class="dashboard-stat-label">Certificates</span>
+        </div>
+    </div>
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon" style="background: rgba(107, 91, 149, 0.1); color: var(--color-secondary);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+        </div>
+        <div class="dashboard-stat-content">
+            <span class="dashboard-stat-value">{{ stats.knowledge_score }}</span>
+            <span class="dashboard-stat-label">Knowledge Score</span>
+        </div>
+    </div>
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </div>
+        <div class="dashboard-stat-content">
+            <span class="dashboard-stat-value">{{ stats.categories_count }}</span>
+            <span class="dashboard-stat-label">Categories</span>
+        </div>
+    </div>
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--color-info);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        </div>
+        <div class="dashboard-stat-content">
+            <span class="dashboard-stat-value">{{ stats.library_count }}</span>
+            <span class="dashboard-stat-label">In Library</span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Main Content -->
+    <div class="dashboard-main">
+        <!-- Recent Certificates -->
+        <div class="card mb-6">
+            <div class="card-body">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="h4">Recent Certificates</h2>
+                    <a href="{{ url_for('certificates.my_certificates') }}" class="text-primary text-sm">View All</a>
+                </div>
+
+                {% if certificates %}
+                    <div class="cert-grid">
+                        {% for cert in certificates[:3] %}
+                            <a href="{{ url_for('certificates.view_certificate', share_token=cert.share_token) }}" class="cert-card" style="min-height: 140px;">
+                                <div class="cert-card-overlay"></div>
+                                <div class="cert-card-content">
+                                    <span class="cert-card-role">{{ cert.get_role_display() }}</span>
+                                    <h4 class="cert-card-title">{{ cert.title or cert.event.title }}</h4>
+                                    <p class="cert-card-date">{{ cert.event.date.strftime('%b %d, %Y') }}</p>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state" style="padding: var(--space-6);">
+                        <svg class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="8" r="7"></circle>
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                        <h3 class="empty-state-title">No certificates yet</h3>
+                        <p class="empty-state-description">Join a knowledge event to earn your first certificate!</p>
+                        <a href="{{ url_for('events.list_events') }}" class="btn btn-primary">Discover Knowledge Events</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Knowledge Identity -->
+        {% if knowledge_identity.roles %}
+        <div class="card mb-6">
+            <div class="card-body">
+                <h2 class="h4 mb-4">Your Knowledge Identity</h2>
+                <div class="knowledge-identity-roles">
+                    {% for role, count in knowledge_identity.roles.items() %}
+                    <div class="identity-role-item">
+                        <span class="badge badge-{{ 'primary' if role == 'organizer' else 'warning' if role == 'speaker' else 'secondary' if role == 'host' else 'info' }}">
+                            {{ role }}
+                        </span>
+                        <span class="text-sm text-secondary">{{ count }} {{ 'certificate' if count == 1 else 'certificates' }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if knowledge_identity.expertise_areas %}
+                <div class="mt-4">
+                    <h4 class="text-sm font-semibold text-secondary mb-2">Areas of Expertise</h4>
+                    <div class="flex flex-wrap gap-2">
+                        {% for area in knowledge_identity.expertise_areas[:8] %}
+                            <span class="badge badge-ghost">{{ area }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="dashboard-sidebar">
+        <!-- Upcoming Events -->
+        {% if upcoming_events %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="h5 mb-4">Knowledge Opportunities</h3>
+                <div class="sidebar-list">
+                    {% for event in upcoming_events %}
+                        <a href="{{ url_for('events.view_event', event_id=event.id) }}" class="sidebar-item">
+                            <div class="sidebar-item-content">
+                                <h4 class="sidebar-item-title">{{ event.title }}</h4>
+                                <p class="sidebar-item-meta">
+                                    {{ event.date.strftime('%b %d') }}
+                                    {% if event.category %} &middot; {{ event.get_category_display() }}{% endif %}
+                                </p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+                <a href="{{ url_for('events.list_events') }}" class="btn btn-ghost btn-sm w-full mt-3">View All Events</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="h5 mb-4">Quick Actions</h3>
+                <div class="flex flex-col gap-2">
+                    <a href="{{ url_for('events.create_event') }}" class="btn btn-primary btn-sm w-full">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Create Knowledge Event
+                    </a>
+                    <a href="{{ url_for('library.view_library') }}" class="btn btn-secondary btn-sm w-full">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        My Knowledge Library
+                    </a>
+                    <a href="{{ url_for('profiles.view_profile', user_id=current_user.id) }}" class="btn btn-ghost btn-sm w-full">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        My Knowledge Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete Profile Reminder -->
+        {% if not current_user.professional_title or not current_user.bio_tagline %}
+        <div class="card">
+            <div class="card-body">
+                <h3 class="h5 mb-2">Complete Your Profile</h3>
+                <p class="text-sm text-secondary mb-4">Add your professional title and tagline to strengthen your knowledge identity.</p>
+                <a href="{{ url_for('profiles.edit_profile') }}" class="btn btn-ghost btn-sm w-full">Complete Profile</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

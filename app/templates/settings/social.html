@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Social Connections - MIKOL{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="mb-6">
+        <a href="{{ url_for('profiles.view_profile', user_id=current_user.id) }}" class="text-secondary flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            חזרה לפרופיל
+        </a>
+    </div>
+
+    <div class="page-header">
+        <h1 class="page-title">חיבור לרשתות חברתיות</h1>
+        <p class="page-subtitle">חבר את החשבונות שלך כדי לשתף אישורים בקליק אחד</p>
+    </div>
+
+    <div class="social-connections-list">
+        <!-- LinkedIn -->
+        <div class="social-connection-card">
+            <div class="social-connection-icon linkedin">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                    <rect x="2" y="9" width="4" height="12"></rect>
+                    <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+            </div>
+            <div class="social-connection-info">
+                <h3 class="social-connection-name">LinkedIn</h3>
+                <p class="social-connection-status">
+                    {% if current_user.linkedin_connected %}
+                        <span class="status-connected">מחובר</span>
+                    {% else %}
+                        <span class="status-disconnected">לא מחובר</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="social-connection-action">
+                {% if current_user.linkedin_connected %}
+                    <form method="POST" action="{{ url_for('settings.disconnect_social', network='linkedin') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-ghost btn-sm">נתק</button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('settings.connect_social', network='linkedin') }}" class="btn btn-primary btn-sm">
+                        חבר
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Twitter/X -->
+        <div class="social-connection-card">
+            <div class="social-connection-icon twitter">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+            </div>
+            <div class="social-connection-info">
+                <h3 class="social-connection-name">X (Twitter)</h3>
+                <p class="social-connection-status">
+                    {% if current_user.twitter_connected %}
+                        <span class="status-connected">מחובר</span>
+                    {% else %}
+                        <span class="status-disconnected">לא מחובר</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="social-connection-action">
+                {% if current_user.twitter_connected %}
+                    <form method="POST" action="{{ url_for('settings.disconnect_social', network='twitter') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-ghost btn-sm">נתק</button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('settings.connect_social', network='twitter') }}" class="btn btn-primary btn-sm">
+                        חבר
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Facebook -->
+        <div class="social-connection-card">
+            <div class="social-connection-icon facebook">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                </svg>
+            </div>
+            <div class="social-connection-info">
+                <h3 class="social-connection-name">Facebook</h3>
+                <p class="social-connection-status">
+                    {% if current_user.facebook_connected %}
+                        <span class="status-connected">מחובר</span>
+                    {% else %}
+                        <span class="status-disconnected">לא מחובר</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="social-connection-action">
+                {% if current_user.facebook_connected %}
+                    <form method="POST" action="{{ url_for('settings.disconnect_social', network='facebook') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-ghost btn-sm">נתק</button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('settings.connect_social', network='facebook') }}" class="btn btn-primary btn-sm">
+                        חבר
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box mt-6">
+        <div class="info-box-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+        </div>
+        <div class="info-box-content">
+            <p>כשתחבר את החשבונות שלך, תוכל לשתף אישורים ברשתות החברתיות בלחיצה אחת.</p>
+            <p class="text-sm text-secondary mt-1">הפוסט יכלול את שם האירוע וקישור לאישור שלך.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

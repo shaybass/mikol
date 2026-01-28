@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}MIKOL - Build Your Knowledge Identity{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="landing-hero">
+    <div class="landing-hero-content">
+        <h1 class="landing-hero-title">צבור ידע.<br>בנה מוניטין.<br>שתף אותו עם העולם.</h1>
+        <p class="landing-hero-subtitle">MIKOL is a professional knowledge network where every event participation becomes a digital certificate in your personal knowledge library.</p>
+        <div class="landing-hero-actions">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                התחל לצבור ידע
+            </a>
+            <a href="{{ url_for('events.list_events') }}" class="btn btn-ghost btn-lg">
+                Explore Knowledge Events
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="landing-section">
+    <h2 class="landing-section-title">How MIKOL Works</h2>
+    <p class="landing-section-subtitle">From event participation to professional identity</p>
+
+    <div class="landing-steps">
+        <div class="landing-step">
+            <div class="landing-step-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+            <h3 class="landing-step-title">Participate</h3>
+            <p class="landing-step-desc">Join knowledge events as a participant, speaker, organizer, or host</p>
+        </div>
+
+        <div class="landing-step-arrow">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </div>
+
+        <div class="landing-step">
+            <div class="landing-step-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="7"></circle>
+                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                </svg>
+            </div>
+            <h3 class="landing-step-title">Earn Certificates</h3>
+            <p class="landing-step-desc">Receive digital knowledge certificates that capture what you learned</p>
+        </div>
+
+        <div class="landing-step-arrow">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </div>
+
+        <div class="landing-step">
+            <div class="landing-step-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+            </div>
+            <h3 class="landing-step-title">Build Library</h3>
+            <p class="landing-step-desc">Your personal knowledge library grows with every event</p>
+        </div>
+
+        <div class="landing-step-arrow">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </div>
+
+        <div class="landing-step">
+            <div class="landing-step-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+            </div>
+            <h3 class="landing-step-title">Share & Grow</h3>
+            <p class="landing-step-desc">Share certificates on LinkedIn, build your professional reputation</p>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+{% if stats %}
+<section class="landing-stats">
+    <div class="landing-stats-grid">
+        <div class="landing-stat">
+            <span class="landing-stat-value">{{ stats.events }}</span>
+            <span class="landing-stat-label">Knowledge Events</span>
+        </div>
+        <div class="landing-stat">
+            <span class="landing-stat-value">{{ stats.certificates }}</span>
+            <span class="landing-stat-label">Certificates Issued</span>
+        </div>
+        <div class="landing-stat">
+            <span class="landing-stat-value">{{ stats.users }}</span>
+            <span class="landing-stat-label">Knowledge Seekers</span>
+        </div>
+        <div class="landing-stat">
+            <span class="landing-stat-value">4</span>
+            <span class="landing-stat-label">Roles</span>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Roles Section -->
+<section class="landing-section">
+    <h2 class="landing-section-title">Four Ways to Participate</h2>
+    <p class="landing-section-subtitle">Each role earns you a unique knowledge certificate</p>
+
+    <div class="landing-roles-grid">
+        <div class="landing-role-card">
+            <div class="landing-role-icon" style="background: var(--color-primary);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <h3 class="landing-role-title">מארגן | Organizer</h3>
+            <p class="landing-role-desc">Create and manage knowledge events. Build your reputation as a community leader.</p>
+            <span class="badge badge-primary">+8 Knowledge Score</span>
+        </div>
+
+        <div class="landing-role-card">
+            <div class="landing-role-icon" style="background: var(--color-warning);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+            </div>
+            <h3 class="landing-role-title">מרצה | Speaker</h3>
+            <p class="landing-role-desc">Share your expertise. Get recognized as a knowledge contributor.</p>
+            <span class="badge badge-warning">+10 Knowledge Score</span>
+        </div>
+
+        <div class="landing-role-card">
+            <div class="landing-role-icon" style="background: var(--color-secondary);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <h3 class="landing-role-title">מנחה | Host</h3>
+            <p class="landing-role-desc">Facilitate and moderate events. Your hosting skills build your professional profile.</p>
+            <span class="badge badge-secondary">+5 Knowledge Score</span>
+        </div>
+
+        <div class="landing-role-card">
+            <div class="landing-role-icon" style="background: var(--color-info);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+            </div>
+            <h3 class="landing-role-title">משתתף | Participant</h3>
+            <p class="landing-role-desc">Learn and grow. Every event adds to your knowledge library.</p>
+            <span class="badge badge-info">+3 Knowledge Score</span>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="landing-cta">
+    <h2 class="landing-cta-title">Ready to Build Your Knowledge Identity?</h2>
+    <p class="landing-cta-text">Join MIKOL and start accumulating verifiable knowledge certificates</p>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+        Create Your Free Account
+    </a>
+</section>
+{% endblock %}

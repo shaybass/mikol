@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}My Knowledge Certificates - MIKOL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Knowledge Certificates</h1>
+        <p class="page-subtitle">Your professional knowledge journey, certified and shareable</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+    <div class="search-box">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search certificates..." id="cert-search">
+    </div>
+    <div class="filter-group">
+        <label class="filter-label">Role:</label>
+        <select class="filter-select" id="role-filter">
+            <option value="all">All Roles</option>
+            <option value="organizer">Organizer</option>
+            <option value="speaker">Speaker</option>
+            <option value="participant">Participant</option>
+            <option value="host">Host</option>
+        </select>
+    </div>
+</div>
+
+{% if certificates %}
+    <div class="cert-grid">
+        {% for cert in certificates %}
+            <a href="{{ url_for('certificates.view_certificate', share_token=cert.share_token) }}" class="cert-card">
+                <div class="cert-card-overlay"></div>
+                <div class="cert-card-content">
+                    <span class="cert-card-role">{{ cert.get_role_display() }}</span>
+                    <h4 class="cert-card-title">{{ cert.title or cert.event.title }}</h4>
+                    <p class="cert-card-date">{{ cert.event.date.strftime('%b %d, %Y') }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+        </svg>
+        <h3 class="empty-state-title">No knowledge certificates yet</h3>
+        <p class="empty-state-description">Join knowledge events to earn certificates and build your professional identity!</p>
+        <a href="{{ url_for('events.list_events') }}" class="btn btn-primary">Discover Knowledge Events</a>
+    </div>
+{% endif %}
+{% endblock %}

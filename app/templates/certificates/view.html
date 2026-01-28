@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate - {{ certificate.event.title }} - MIKOL{% endblock %}
+
+{% block og_title %}{{ certificate.user.name }} - {{ certificate.role }} at {{ certificate.event.title }}{% endblock %}
+{% block og_description %}{{ certificate.user.name }} participated as {{ certificate.role }} in {{ certificate.event.title }}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{{ url_for('certificates.my_certificates') }}" class="text-secondary flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Certificates
+    </a>
+</div>
+
+<!-- Certificate Card -->
+<div class="certificate-card mb-6">
+    <div class="certificate-content">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MIKOL" style="height: 48px; margin: 0 auto var(--space-4);">
+        <h1 class="certificate-title">Certificate of Participation</h1>
+        <p class="text-sm" style="opacity: 0.9;">This is to certify that</p>
+
+        <p class="certificate-holder">{{ certificate.user.name }}</p>
+        <p class="certificate-role">{{ certificate.role }}</p>
+
+        <p class="text-sm" style="opacity: 0.9;">participated in</p>
+        <p class="certificate-event">{{ certificate.event.title }}</p>
+
+        <p class="certificate-date mt-6">
+            Event Date: {{ certificate.event.date.strftime('%B %d, %Y') }}<br>
+            Issued: {{ certificate.issued_at.strftime('%B %d, %Y') }}
+        </p>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="card mb-6">
+    <div class="card-body">
+        <div class="flex flex-wrap gap-3 mb-6">
+            <button class="btn btn-primary" data-modal="share-modal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                Share
+            </button>
+            {% if current_user.is_authenticated %}
+                {% if not is_saved %}
+                    <form method="POST" action="{{ url_for('certificates.save_certificate', cert_id=certificate.id) }}" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Save to Library
+                        </button>
+                    </form>
+                {% else %}
+                    <span class="btn btn-ghost" style="cursor: default;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Saved
+                    </span>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Share Link -->
+        <div class="copy-link-group">
+            <input type="text" class="copy-link-input" id="share-url" value="{{ request.url }}" readonly>
+            <button class="copy-link-btn" data-copy="share-url">Copy Link</button>
+        </div>
+    </div>
+</div>
+
+<!-- Certificate Details -->
+<div class="card">
+    <div class="card-body">
+        <h3 class="h4 mb-4">Certificate Details</h3>
+
+        <div class="grid gap-4" style="max-width: 500px;">
+            <div class="flex justify-between">
+                <span class="text-secondary">Event</span>
+                <a href="{{ url_for('events.view_event', event_id=certificate.event_id) }}" class="text-primary font-medium">{{ certificate.event.title }}</a>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-secondary">Certificate Holder</span>
+                <a href="{{ url_for('profiles.view_profile', user_id=certificate.user_id) }}" class="text-primary font-medium">{{ certificate.user.name }}</a>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-secondary">Role</span>
+                <span class="badge badge-{{ certificate.role }}">{{ certificate.role }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-secondary">Event Date</span>
+                <span>{{ certificate.event.date.strftime('%B %d, %Y') }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-secondary">Location</span>
+                <span>{% if certificate.event.is_online %}Online{% else %}{{ certificate.event.location or 'N/A' }}{% endif %}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-secondary">Organized by</span>
+                <a href="{{ url_for('profiles.view_profile', user_id=certificate.event.organizer_id) }}" class="text-primary">{{ certificate.event.organizer.name }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Knowledge Units -->
+{% if certificate.event.knowledge_units.count() > 0 %}
+<div class="card mt-6">
+    <div class="card-body">
+        <h3 class="h4 mb-4">Knowledge Units from this Event</h3>
+        <div class="knowledge-list">
+            {% for ku in certificate.event.knowledge_units %}
+                <div class="knowledge-item">
+                    <div class="knowledge-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    <div class="knowledge-content">
+                        <h4 class="knowledge-title">{{ ku.title }}</h4>
+                        {% if ku.content %}
+                            <p class="knowledge-description">{{ ku.content }}</p>
+                        {% endif %}
+                        <div class="knowledge-meta">
+                            <span class="badge badge-info">{{ ku.type }}</span>
+                            {% if ku.url %}
+                                <a href="{{ ku.url }}" target="_blank" class="text-primary">View Resource</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Share Modal -->
+<div class="modal" id="share-modal">
+    <div class="modal-header">
+        <h3 class="modal-title">Share Certificate</h3>
+        <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+        <div class="share-menu">
+            <button class="share-btn" data-share="facebook" data-url="{{ request.url }}" data-title="{{ certificate.user.name }} earned a certificate">
+                <div class="share-btn-icon facebook">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                    </svg>
+                </div>
+                <span class="share-btn-label">Facebook</span>
+            </button>
+            <button class="share-btn" data-share="linkedin" data-url="{{ request.url }}">
+                <div class="share-btn-icon linkedin">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect x="2" y="9" width="4" height="12"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                    </svg>
+                </div>
+                <span class="share-btn-label">LinkedIn</span>
+            </button>
+            <button class="share-btn" data-share="twitter" data-url="{{ request.url }}" data-title="{{ certificate.user.name }} earned a certificate at {{ certificate.event.title }}">
+                <div class="share-btn-icon twitter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </div>
+                <span class="share-btn-label">X</span>
+            </button>
+            <button class="share-btn" data-share="whatsapp" data-url="{{ request.url }}" data-title="Check out my certificate from {{ certificate.event.title }}">
+                <div class="share-btn-icon whatsapp">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                </div>
+                <span class="share-btn-label">WhatsApp</span>
+            </button>
+            <button class="share-btn" data-share="copy" data-url="{{ request.url }}">
+                <div class="share-btn-icon copy">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </div>
+                <span class="share-btn-label">Copy</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

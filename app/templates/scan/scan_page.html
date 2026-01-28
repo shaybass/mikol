@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Scan QR Code - MIKOL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Scan QR Code</h1>
+        <p class="page-subtitle">Point your camera at an event QR code</p>
+    </div>
+</div>
+
+<div class="scanner-container">
+    <div class="scanner-viewport">
+        <video id="qr-video" playsinline></video>
+        <div class="scanner-overlay">
+            <div class="scanner-frame"></div>
+        </div>
+    </div>
+
+    <div class="scanner-status" id="scanner-status">
+        <p>Initializing camera...</p>
+    </div>
+
+    <div class="scanner-actions">
+        <button id="start-scan" class="btn btn-primary" style="display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Start Scanning
+        </button>
+        <button id="stop-scan" class="btn btn-secondary" style="display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="6" y="6" width="12" height="12"></rect>
+            </svg>
+            Stop Scanning
+        </button>
+    </div>
+
+    <div class="scanner-result card" id="scanner-result" style="display: none;">
+        <div class="card-body">
+            <h3 class="h4 mb-3" id="result-title">Event Found!</h3>
+            <p class="text-secondary mb-4" id="result-message">Redirecting...</p>
+            <a href="#" id="result-link" class="btn btn-primary">Go to Event</a>
+        </div>
+    </div>
+
+    <div class="scanner-error card" id="scanner-error" style="display: none;">
+        <div class="card-body text-center">
+            <svg class="text-error mb-3" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <h3 class="h4 mb-2">Camera Error</h3>
+            <p class="text-secondary mb-4" id="error-message">Unable to access camera</p>
+            <button class="btn btn-primary" onclick="location.reload()">Try Again</button>
+        </div>
+    </div>
+</div>
+
+<!-- Manual Entry -->
+<div class="card mt-6">
+    <div class="card-body">
+        <h3 class="h5 mb-4">Enter Event Code Manually</h3>
+        <form id="manual-entry" class="flex gap-3">
+            <input type="text" class="form-input" id="event-code" placeholder="Enter event code or URL">
+            <button type="submit" class="btn btn-primary">Go</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/@aspect-js/qr-code-scanner@1.0.0/qr-scanner.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('qr-video');
+    const status = document.getElementById('scanner-status');
+    const startBtn = document.getElementById('start-scan');
+    const stopBtn = document.getElementById('stop-scan');
+    const resultDiv = document.getElementById('scanner-result');
+    const errorDiv = document.getElementById('scanner-error');
+    const resultTitle = document.getElementById('result-title');
+    const resultMessage = document.getElementById('result-message');
+    const resultLink = document.getElementById('result-link');
+    const errorMessage = document.getElementById('error-message');
+
+    let scanner = null;
+    let isScanning = false;
+
+    async function initScanner() {
+        try {
+            // Check if QrScanner is available
+            if (typeof QrScanner === 'undefined') {
+                // Fallback: use native camera API
+                await initNativeScanner();
+                return;
+            }
+
+            scanner = new QrScanner(
+                video,
+                result => handleScanResult(result.data),
+                {
+                    highlightScanRegion: true,
+                    highlightCodeOutline: true,
+                }
+            );
+
+            status.innerHTML = '<p class="text-success">Camera ready!</p>';
+            startBtn.style.display = 'inline-flex';
+
+        } catch (err) {
+            showError(err.message || 'Camera initialization failed');
+        }
+    }
+
+    async function initNativeScanner() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }
+            });
+            video.srcObject = stream;
+            await video.play();
+
+            status.innerHTML = '<p class="text-warning">Basic camera mode (QR scanning not available)</p>';
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-flex';
+            isScanning = true;
+
+        } catch (err) {
+            showError('Camera access denied. Please allow camera access and try again.');
+        }
+    }
+
+    function handleScanResult(data) {
+        if (!isScanning) return;
+
+        // Stop scanning
+        stopScanning();
+
+        // Process the scanned data
+        fetch('{{ url_for("scan.process_scan") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ qr_data: data })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                resultTitle.textContent = 'Found!';
+                resultMessage.textContent = 'Redirecting to ' + result.type + '...';
+                resultLink.href = result.redirect_url;
+                resultDiv.style.display = 'block';
+
+                // Auto redirect after 1 second
+                setTimeout(() => {
+                    window.location.href = result.redirect_url;
+                }, 1000);
+            } else {
+                showError(result.error);
+            }
+        })
+        .catch(err => {
+            showError('Failed to process QR code');
+        });
+    }
+
+    function startScanning() {
+        if (scanner) {
+            scanner.start();
+        }
+        isScanning = true;
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-flex';
+        status.innerHTML = '<p class="text-primary">Scanning...</p>';
+    }
+
+    function stopScanning() {
+        if (scanner) {
+            scanner.stop();
+        }
+        isScanning = false;
+        startBtn.style.display = 'inline-flex';
+        stopBtn.style.display = 'none';
+        status.innerHTML = '<p>Scanning paused</p>';
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorDiv.style.display = 'block';
+        status.style.display = 'none';
+    }
+
+    startBtn.addEventListener('click', startScanning);
+    stopBtn.addEventListener('click', stopScanning);
+
+    // Manual entry form
+    document.getElementById('manual-entry').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const code = document.getElementById('event-code').value.trim();
+
+        if (code) {
+            // Check if it's a URL
+            if (code.startsWith('http')) {
+                window.location.href = code;
+            } else {
+                // Assume it's an event ID
+                window.location.href = '/events/' + code;
+            }
+        }
+    });
+
+    // Initialize scanner
+    initScanner();
+});
+</script>
+{% endblock %}

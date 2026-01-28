@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - MIKOL{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{{ url_for('profiles.view_profile', user_id=current_user.id) }}" class="text-secondary flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Profile
+    </a>
+</div>
+
+<div class="page-header">
+    <h1 class="page-title">Edit Profile</h1>
+</div>
+
+<div class="card" style="max-width: 500px;">
+    <div class="card-body">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                <label class="form-label" for="name">Name *</label>
+                {{ form.name(class="form-input", id="name") }}
+                {% for error in form.name.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="professional_title">Professional Definition</label>
+                {{ form.professional_title(class="form-input", placeholder="e.g. Software Engineer, Product Designer", id="professional_title") }}
+                <p class="form-hint">One line that describes what you do</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="activity_area">Activity Area</label>
+                {{ form.activity_area(class="form-input", placeholder="e.g. Tel Aviv, Israel", id="activity_area") }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="interests_text">Interests</label>
+                {{ form.interests_text(class="form-input", placeholder="AI, Startups, Design, Tech, Leadership", id="interests_text") }}
+                <p class="form-hint">Up to 5 topics, comma-separated</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="avatar_url">Profile Picture URL</label>
+                {{ form.avatar_url(class="form-input", placeholder="https://...", id="avatar_url") }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="cover_url">Cover Image URL</label>
+                {{ form.cover_url(class="form-input", placeholder="https://...", id="cover_url") }}
+            </div>
+
+            <hr style="margin: var(--space-5) 0; border-color: var(--color-border);">
+
+            <h3 class="h5 mb-4">Value Proposition (Optional)</h3>
+
+            <div class="form-group">
+                <label class="form-label" for="value_proposition_title">Title</label>
+                {{ form.value_proposition_title(class="form-input", placeholder="e.g. Available for consulting, Open for speaking", id="value_proposition_title") }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="value_proposition">Description</label>
+                {{ form.value_proposition(class="form-textarea", placeholder="What value do you bring? Keep it short.", id="value_proposition", rows="3") }}
+            </div>
+
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.show_contact_cta(class="form-check-input", id="show_contact_cta") }}
+                    <label class="form-check-label" for="show_contact_cta">Show "Contact me" button</label>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{{ url_for('profiles.view_profile', user_id=current_user.id) }}" class="btn btn-ghost">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

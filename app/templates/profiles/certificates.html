@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.name }}'s Certificates - MIKOL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">{{ profile_user.name }}'s Certificates</h1>
+</div>
+
+<p class="mb-2">
+    <a href="{{ url_for('profiles.view_profile', user_id=profile_user.id) }}">&larr; Back to Profile</a>
+</p>
+
+{% if certificates %}
+    <div class="cert-list">
+        {% for cert in certificates %}
+            <div class="cert-item">
+                <div class="cert-info">
+                    <h4>
+                        <a href="{{ url_for('certificates.view_certificate', share_token=cert.share_token) }}">
+                            {{ cert.event.title }}
+                        </a>
+                    </h4>
+                    <p>{{ cert.event.date.strftime('%B %d, %Y') }} | Organized by {{ cert.event.organizer.name }}</p>
+                    <p>Issued: {{ cert.issued_at.strftime('%B %d, %Y') }}</p>
+                </div>
+                <span class="cert-role role-{{ cert.role }}">{{ cert.role }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>No certificates yet</h3>
+    </div>
+{% endif %}
+{% endblock %}

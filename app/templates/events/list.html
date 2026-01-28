@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Discover Knowledge Events - MIKOL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Discover Knowledge Events</h1>
+        <p class="page-subtitle">Find opportunities to learn, share, and build your professional knowledge identity</p>
+    </div>
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('events.create_event') }}" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Create Knowledge Event
+        </a>
+    {% endif %}
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+    <div class="search-box">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search events..." id="event-search">
+    </div>
+    <div class="filter-group">
+        <label class="filter-label">Status:</label>
+        <select class="filter-select" id="status-filter">
+            <option value="all">All Events</option>
+            <option value="published" selected>Published</option>
+            <option value="completed">Completed</option>
+        </select>
+    </div>
+</div>
+
+{% if events %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for event in events %}
+            <div class="card card-hover event-card">
+                <div class="event-card-image">
+                    {% if event.image_url %}
+                        <img src="{{ event.image_url }}" alt="{{ event.title }}">
+                    {% endif %}
+                    <div class="event-card-status">
+                        <span class="badge badge-{% if event.status == 'completed' %}secondary{% elif event.status == 'published' %}success{% else %}warning{% endif %}">
+                            {{ event.status }}
+                        </span>
+                    </div>
+                </div>
+                <div class="event-card-body">
+                    <h3 class="event-card-title">
+                        <a href="{{ url_for('events.view_event', event_id=event.id) }}">{{ event.title }}</a>
+                    </h3>
+                    <div class="event-card-meta">
+                        <div class="event-card-meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>{{ event.date.strftime('%b %d, %Y at %H:%M') }}</span>
+                        </div>
+                        <div class="event-card-meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                {% if event.is_online %}
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                {% else %}
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                {% endif %}
+                            </svg>
+                            <span>{% if event.is_online %}Online{% else %}{{ event.location or 'TBD' }}{% endif %}</span>
+                        </div>
+                    </div>
+                    {% if event.description %}
+                        <p class="event-card-description">{{ event.description }}</p>
+                    {% endif %}
+                    <div class="event-card-footer">
+                        <div class="event-card-organizer">
+                            <div class="avatar avatar-sm">
+                                {% if event.organizer.avatar_url %}
+                                    <img src="{{ event.organizer.avatar_url }}" alt="{{ event.organizer.name }}">
+                                {% else %}
+                                    {{ event.organizer.name[0].upper() }}
+                                {% endif %}
+                            </div>
+                            <span class="event-card-organizer-name">{{ event.organizer.name }}</span>
+                        </div>
+                        <a href="{{ url_for('events.view_event', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <h3 class="empty-state-title">No knowledge events yet</h3>
+        <p class="empty-state-description">Be the first to create a knowledge event and start building your professional identity!</p>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('events.create_event') }}" class="btn btn-primary">Create Knowledge Event</a>
+        {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Sign Up to Create Events</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

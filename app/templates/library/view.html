@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Knowledge Library - MIKOL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Knowledge Library</h1>
+        <p class="page-subtitle">Your personal collection of knowledge certificates</p>
+    </div>
+</div>
+
+<!-- Library Stats -->
+<div class="library-stats">
+    <div class="library-stat">
+        <span class="library-stat-value">{{ stats.total }}</span>
+        <span class="library-stat-label">Total</span>
+    </div>
+    <div class="library-stat">
+        <span class="library-stat-value">{{ stats.own }}</span>
+        <span class="library-stat-label">My Certificates</span>
+    </div>
+    <div class="library-stat">
+        <span class="library-stat-value">{{ stats.saved }}</span>
+        <span class="library-stat-label">Saved from Others</span>
+    </div>
+</div>
+
+<!-- Filters -->
+{% if roles or categories %}
+<div class="library-filters">
+    <div class="filter-group">
+        <span class="filter-label">Filter by:</span>
+        <a href="{{ url_for('library.view_library') }}" class="badge {{ 'badge-primary' if not current_role and not current_category else 'badge-ghost' }}">All</a>
+
+        {% for role in roles %}
+            <a href="{{ url_for('library.view_library', role=role, category=current_category) }}"
+               class="badge {{ 'badge-primary' if current_role == role else 'badge-ghost' }}">
+                {{ role|capitalize }}
+            </a>
+        {% endfor %}
+
+        {% if categories %}
+            <span class="filter-divider">|</span>
+            {% for cat in categories %}
+                <a href="{{ url_for('library.view_library', category=cat, role=current_role) }}"
+                   class="badge {{ 'badge-primary' if current_category == cat else 'badge-ghost' }}">
+                    {{ cat|capitalize }}
+                </a>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% if library_items %}
+    <div class="cert-grid">
+        {% for item in library_items %}
+            <div class="card card-hover library-card">
+                <a href="{{ url_for('certificates.view_certificate', share_token=item.certificate.share_token) }}" class="cert-card" style="min-height: 160px;">
+                    <div class="cert-card-overlay"></div>
+                    <div class="cert-card-content">
+                        <span class="cert-card-role">{{ item.certificate.get_role_display() }}</span>
+                        <h4 class="cert-card-title">{{ item.certificate.title or item.certificate.event.title }}</h4>
+                        <p class="cert-card-date">{{ item.certificate.event.date.strftime('%b %d, %Y') }}</p>
+                    </div>
+                </a>
+                <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+                    <div class="flex items-center justify-between">
+                        <a href="{{ url_for('profiles.view_profile', user_id=item.certificate.user_id) }}" class="flex items-center gap-2">
+                            <div class="avatar avatar-xs">
+                                {% if item.certificate.user.avatar_url %}
+                                    <img src="{{ item.certificate.user.avatar_url }}" alt="{{ item.certificate.user.name }}">
+                                {% else %}
+                                    {{ item.certificate.user.name[0].upper() }}
+                                {% endif %}
+                            </div>
+                            <div class="library-card-meta">
+                                <span class="text-sm font-medium">{{ item.certificate.user.name }}</span>
+                                {% if item.certificate.user.professional_title %}
+                                    <span class="text-xs text-secondary">{{ item.certificate.user.professional_title }}</span>
+                                {% endif %}
+                            </div>
+                        </a>
+                        <div class="flex items-center gap-2">
+                            {% if item.certificate.cert_metadata and item.certificate.cert_metadata.get('category') %}
+                                <span class="badge badge-ghost text-xs">{{ item.certificate.cert_metadata['category'] }}</span>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('library.remove_from_library', item_id=item.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-ghost btn-sm text-error" onclick="return confirmDelete('Remove from library?')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        {% if current_role or current_category %}
+            <h3 class="empty-state-title">No certificates match this filter</h3>
+            <p class="empty-state-description">Try a different filter or browse all certificates.</p>
+            <a href="{{ url_for('library.view_library') }}" class="btn btn-primary">View All</a>
+        {% else %}
+            <h3 class="empty-state-title">Your knowledge library is empty</h3>
+            <p class="empty-state-description">Join knowledge events to earn certificates, or save certificates from people you find inspiring!</p>
+            <a href="{{ url_for('events.list_events') }}" class="btn btn-primary">Discover Knowledge Events</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

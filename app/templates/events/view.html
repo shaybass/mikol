@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} - MIKOL{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{{ url_for('events.list_events') }}" class="text-secondary flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Knowledge Events
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+            <div>
+                <span class="badge badge-{% if event.status == 'completed' %}secondary{% elif event.status == 'published' %}success{% else %}warning{% endif %} mb-2">
+                    {{ event.status }}
+                </span>
+                <h1 class="h2">{{ event.title }}</h1>
+            </div>
+            {% if current_user.is_authenticated and current_user.id == event.organizer_id %}
+                <div class="flex gap-2">
+                    <a href="{{ url_for('events.edit_event', event_id=event.id) }}" class="btn btn-secondary btn-sm">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Edit
+                    </a>
+                    {% if event.status != 'completed' %}
+                        <a href="{{ url_for('events.event_qr', event_id=event.id) }}" class="btn btn-secondary btn-sm">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                            </svg>
+                            QR Code
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="flex flex-wrap gap-6 text-secondary mb-6">
+            <div class="flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>{{ event.date.strftime('%B %d, %Y at %H:%M') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    {% if event.is_online %}
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    {% else %}
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    {% endif %}
+                </svg>
+                <span>{% if event.is_online %}Online Event{% else %}{{ event.location or 'Location TBD' }}{% endif %}</span>
+            </div>
+            <a href="{{ url_for('profiles.view_profile', user_id=event.organizer_id) }}" class="flex items-center gap-2">
+                <div class="avatar avatar-xs">
+                    {% if event.organizer.avatar_url %}
+                        <img src="{{ event.organizer.avatar_url }}" alt="{{ event.organizer.name }}">
+                    {% else %}
+                        {{ event.organizer.name[0].upper() }}
+                    {% endif %}
+                </div>
+                <span>{{ event.organizer.name }}</span>
+            </a>
+        </div>
+
+        {% if event.category %}
+            <span class="badge badge-ghost mb-4">{{ event.get_category_display() }}</span>
+        {% endif %}
+
+        {% if event.description %}
+            <div class="p-4 bg-surface rounded-lg mb-6">
+                <p>{{ event.description }}</p>
+            </div>
+        {% endif %}
+
+        <!-- Knowledge Outcomes -->
+        {% if event.knowledge_outcomes %}
+        <div class="knowledge-outcomes-section mb-6">
+            <h3 class="h5 mb-3">What You'll Learn</h3>
+            <div class="knowledge-outcomes-list">
+                {% for outcome in event.knowledge_outcomes %}
+                <div class="knowledge-outcome-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span>{{ outcome }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-3">
+            {% if current_user.is_authenticated %}
+                {% if not user_participation %}
+                    <form method="POST" action="{{ url_for('events.join_event', event_id=event.id) }}" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="role-selector">
+                            <div class="role-option">
+                                <input type="radio" name="role" value="participant" id="role-participant" checked>
+                                <label for="role-participant">Participant</label>
+                            </div>
+                            <div class="role-option">
+                                <input type="radio" name="role" value="speaker" id="role-speaker">
+                                <label for="role-speaker">Speaker</label>
+                            </div>
+                            <div class="role-option">
+                                <input type="radio" name="role" value="host" id="role-host">
+                                <label for="role-host">Host</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Join Event</button>
+                    </form>
+                {% else %}
+                    <span class="badge badge-{% if user_participation.role == 'organizer' %}organizer{% elif user_participation.role == 'speaker' %}speaker{% elif user_participation.role == 'host' %}host{% else %}participant{% endif %}">
+                        Joined as {{ user_participation.role }}
+                    </span>
+                    {% if user_participation.role != 'organizer' %}
+                        <form method="POST" action="{{ url_for('events.leave_event', event_id=event.id) }}" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-ghost btn-sm text-error" onclick="return confirm('Leave this event?')">Leave Event</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+
+                {% if current_user.id == event.organizer_id and event.status != 'completed' %}
+                    <form method="POST" action="{{ url_for('events.complete_event', event_id=event.id) }}" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-primary" onclick="return confirm('Complete this event and generate certificates for all participants?')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            Complete & Generate Certificates
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if user_participation and user_participation.role in ['organizer', 'speaker'] %}
+                    <a href="{{ url_for('events.add_knowledge_unit', event_id=event.id) }}" class="btn btn-secondary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        Add Knowledge Unit
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login to Join</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Participants -->
+<div class="card mt-6">
+    <div class="card-body">
+        <h3 class="h4 mb-4">Participants</h3>
+        <div class="participants-section">
+            {% for role in ['organizer', 'speaker', 'host', 'participant'] %}
+                {% if participants[role] %}
+                    <div class="participants-role-group">
+                        <h4 class="participants-role-title">{{ role }}s ({{ participants[role]|length }})</h4>
+                        <div class="participants-list">
+                            {% for user in participants[role] %}
+                                <div class="participant-chip">
+                                    <div class="avatar avatar-xs">
+                                        {% if user.avatar_url %}
+                                            <img src="{{ user.avatar_url }}" alt="{{ user.name }}">
+                                        {% else %}
+                                            {{ user.name[0].upper() }}
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ url_for('profiles.view_profile', user_id=user.id) }}">{{ user.name }}</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Knowledge Units -->
+{% if knowledge_units %}
+<div class="card mt-6">
+    <div class="card-body">
+        <h3 class="h4 mb-4">Knowledge Units</h3>
+        <div class="knowledge-list">
+            {% for ku in knowledge_units %}
+                <div class="knowledge-item">
+                    <div class="knowledge-icon">
+                        {% if ku.type == 'presentation' %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                            </svg>
+                        {% elif ku.type == 'recording' %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                            </svg>
+                        {% elif ku.type == 'document' %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                        {% else %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        {% endif %}
+                    </div>
+                    <div class="knowledge-content">
+                        <h4 class="knowledge-title">{{ ku.title }}</h4>
+                        {% if ku.content %}
+                            <p class="knowledge-description">{{ ku.content }}</p>
+                        {% endif %}
+                        <div class="knowledge-meta">
+                            <span class="badge badge-info">{{ ku.type }}</span>
+                            <span>by {{ ku.author.name }}</span>
+                            {% if ku.url %}
+                                <a href="{{ ku.url }}" target="_blank" class="text-primary">View Resource</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

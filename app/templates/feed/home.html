@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Feed - MIKOL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Your Feed</h1>
+        <p class="page-subtitle">Updates from people you follow</p>
+    </div>
+</div>
+
+<div class="feed-layout">
+    <!-- Main Feed -->
+    <div class="feed-main">
+        {% if activities %}
+            <div class="feed-list">
+                {% for activity in activities %}
+                    <div class="feed-item card">
+                        <div class="feed-item-header">
+                            <a href="{{ url_for('profiles.view_profile', user_id=activity.user_id) }}" class="feed-item-avatar">
+                                <div class="avatar avatar-md">
+                                    {% if activity.user.avatar_url %}
+                                        <img src="{{ activity.user.avatar_url }}" alt="{{ activity.user.name }}">
+                                    {% else %}
+                                        {{ activity.user.name[0].upper() }}
+                                    {% endif %}
+                                </div>
+                            </a>
+                            <div class="feed-item-meta">
+                                <a href="{{ url_for('profiles.view_profile', user_id=activity.user_id) }}" class="feed-item-name">{{ activity.user.name }}</a>
+                                <span class="feed-item-time">{{ activity.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                        </div>
+                        <div class="feed-item-content">
+                            {% set content = activity.get_content() %}
+                            {% if activity.activity_type == 'created_event' %}
+                                <p class="feed-item-text">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Created a new event
+                                </p>
+                                <a href="{{ url_for('events.view_event', event_id=content.event_id) }}" class="feed-item-card">
+                                    <div class="feed-event-card">
+                                        <h4 class="feed-event-title">{{ content.event_title }}</h4>
+                                        <span class="badge badge-primary">View Event</span>
+                                    </div>
+                                </a>
+                            {% elif activity.activity_type == 'received_certificate' %}
+                                <p class="feed-item-text">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="8" r="7"></circle>
+                                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                                    </svg>
+                                    Received a certificate as <span class="badge badge-{{ content.role }}">{{ content.role }}</span>
+                                </p>
+                                <a href="{{ url_for('events.view_event', event_id=content.event_id) }}" class="feed-item-card">
+                                    <div class="feed-event-card">
+                                        <h4 class="feed-event-title">{{ content.event_title }}</h4>
+                                        <span class="badge badge-secondary">View Event</span>
+                                    </div>
+                                </a>
+                            {% elif activity.activity_type == 'followed_user' %}
+                                <p class="feed-item-text">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="8.5" cy="7" r="4"></circle>
+                                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                                    </svg>
+                                    Started following <a href="{{ url_for('profiles.view_profile', user_id=content.user_id) }}">{{ content.user_name }}</a>
+                                </p>
+                            {% elif activity.activity_type == 'joined_mikol' %}
+                                <p class="feed-item-text">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                    Joined MIKOL
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <h3 class="empty-state-title">Your feed is empty</h3>
+                <p class="empty-state-description">Follow some users to see their activities here!</p>
+                <a href="{{ url_for('events.list_events') }}" class="btn btn-primary">Browse Events</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="feed-sidebar">
+        <!-- Upcoming Events -->
+        {% if upcoming_events %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="h5 mb-4">Upcoming Events</h3>
+                <div class="sidebar-list">
+                    {% for event in upcoming_events %}
+                        <a href="{{ url_for('events.view_event', event_id=event.id) }}" class="sidebar-item">
+                            <div class="sidebar-item-content">
+                                <h4 class="sidebar-item-title">{{ event.title }}</h4>
+                                <p class="sidebar-item-meta">{{ event.date.strftime('%b %d, %Y') }}</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+                <a href="{{ url_for('events.list_events') }}" class="btn btn-ghost btn-sm w-full mt-3">View All Events</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Suggested Users -->
+        {% if suggested_users %}
+        <div class="card">
+            <div class="card-body">
+                <h3 class="h5 mb-4">Suggested Users</h3>
+                <div class="sidebar-list">
+                    {% for user in suggested_users %}
+                        <div class="sidebar-item">
+                            <a href="{{ url_for('profiles.view_profile', user_id=user.id) }}" class="flex items-center gap-3">
+                                <div class="avatar avatar-sm">
+                                    {% if user.avatar_url %}
+                                        <img src="{{ user.avatar_url }}" alt="{{ user.name }}">
+                                    {% else %}
+                                        {{ user.name[0].upper() }}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="sidebar-item-title">{{ user.name }}</h4>
+                                    <p class="sidebar-item-meta">{{ user.certificates_count }} certificates</p>
+                                </div>
+                            </a>
+                            <button class="btn btn-sm btn-primary btn-follow" data-user-id="{{ user.id }}">
+                                <span class="follow-text">Follow</span>
+                                <span class="unfollow-text">Unfollow</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}{{ certificate.title or certificate.event.title }} - MIKOL{% endblock %}
+
+{% block og_title %}{{ certificate.user.name }} - {{ certificate.get_role_display() }} | {{ certificate.title or certificate.event.title }}{% endblock %}
+{% block og_description %}{{ certificate.user.name }} received a knowledge certificate as {{ certificate.role }} in {{ certificate.title or certificate.event.title }} on MIKOL{% endblock %}
+
+{% block content %}
+<div class="collect-page">
+    <!-- Certificate Preview Card -->
+    <div class="cert-preview-card">
+        <!-- Event Image -->
+        {% if certificate.event.image_url %}
+        <div class="cert-preview-image">
+            <img src="{{ certificate.event.image_url }}" alt="{{ certificate.event.title }}">
+        </div>
+        {% endif %}
+
+        <!-- Certificate Content -->
+        <div class="cert-preview-content">
+            <div class="cert-preview-badge">
+                <span class="cert-role-tag role-{{ certificate.role }}">{{ certificate.get_role_display() }}</span>
+            </div>
+
+            <h1 class="cert-preview-title">{{ certificate.title or certificate.event.title }}</h1>
+
+            <div class="cert-preview-meta">
+                <div class="cert-meta-row">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span>{{ certificate.event.date.strftime('%d.%m.%Y') }}</span>
+                </div>
+                <div class="cert-meta-row">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span>{% if certificate.event.is_online %}Online{% else %}{{ certificate.event.location or 'TBD' }}{% endif %}</span>
+                </div>
+            </div>
+
+            <!-- Certificate Holder -->
+            <div class="cert-holder-section">
+                <div class="cert-holder-avatar">
+                    <div class="avatar avatar-md">
+                        {% if certificate.user.avatar_url %}
+                            <img src="{{ certificate.user.avatar_url }}" alt="{{ certificate.user.name }}">
+                        {% else %}
+                            {{ certificate.user.name[0].upper() }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="cert-holder-info">
+                    <p class="cert-holder-name">{{ certificate.user.name }}</p>
+                    {% if certificate.user.professional_title %}
+                        <p class="cert-holder-title">{{ certificate.user.professional_title }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Speakers Section -->
+            {% if certificate.speakers %}
+            <div class="cert-people-chips">
+                <span class="cert-people-label">מרצים:</span>
+                {% for speaker in certificate.speakers %}
+                    <a href="{{ url_for('profiles.view_profile', user_id=speaker.user_id) }}" class="person-chip">
+                        {{ speaker.name }}
+                    </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Knowledge Outcomes -->
+            {% if certificate.event.knowledge_outcomes %}
+            <div class="cert-outcomes">
+                <p class="cert-outcomes-label">מה למדתי:</p>
+                <ul class="cert-outcomes-list">
+                    {% for outcome in certificate.event.knowledge_outcomes[:3] %}
+                        <li>{{ outcome }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons - Two-Button Flow -->
+    <div class="collect-actions">
+        {% if current_user.is_authenticated %}
+            {% if is_owner %}
+                <!-- This is the certificate owner's view -->
+                <a href="{{ url_for('certificates.share_certificate', token=certificate.share_token) }}" class="btn btn-primary btn-collect">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    שתף אישור
+                </a>
+                <a href="{{ url_for('profiles.view_profile', user_id=current_user.id) }}" class="btn btn-secondary btn-collect">
+                    הפרופיל שלי
+                </a>
+            {% elif is_collected %}
+                <!-- Already collected -->
+                <div class="collected-notice">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span>האישור נוסף לספריה שלך</span>
+                </div>
+                <a href="{{ url_for('certificates.share_certificate', token=certificate.share_token) }}" class="btn btn-primary btn-collect">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    שתף לרשתות
+                </a>
+                <a href="{{ url_for('library.view_library') }}" class="btn btn-secondary btn-collect">
+                    הספריה שלי
+                </a>
+            {% else %}
+                <!-- Two-button collection flow -->
+                <form method="POST" action="{{ url_for('certificates.collect_certificate', token=certificate.share_token) }}" class="collect-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-secondary btn-collect">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        איסוף אישור
+                    </button>
+                </form>
+                <form method="POST" action="{{ url_for('certificates.collect_and_share', token=certificate.share_token) }}" class="collect-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary btn-collect">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                        איסוף + שיתוף
+                    </button>
+                </form>
+            {% endif %}
+        {% else %}
+            <!-- Not logged in - prompt to register/login -->
+            <a href="{{ url_for('auth.login', next=request.url) }}" class="btn btn-secondary btn-collect">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                איסוף אישור
+            </a>
+            <a href="{{ url_for('auth.register', next=request.url) }}" class="btn btn-primary btn-collect">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                הרשמה + שיתוף
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- View Profile Link -->
+    <div class="cert-profile-link">
+        <a href="{{ url_for('profiles.view_profile', user_id=certificate.user_id) }}">
+            צפייה בפרופיל של {{ certificate.user.name }}
+        </a>
+    </div>
+</div>
+{% endblock %}
