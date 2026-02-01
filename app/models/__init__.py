@@ -6,8 +6,9 @@ from app.models.certificate import Certificate
 from app.models.library import Library
 from app.models.follow import Follow
 from app.models.activity import Activity
+from app.models.certificate_view import CertificateView
 
 __all__ = [
     'User', 'Event', 'EventParticipation', 'KnowledgeUnit',
-    'Certificate', 'Library', 'Follow', 'Activity'
+    'Certificate', 'Library', 'Follow', 'Activity', 'CertificateView'
 ]

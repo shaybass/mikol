@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Agenda - {{ event.title }} - MIKOL{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{{ url_for('events.view_event', event_id=event.id) }}" class="text-secondary flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Event
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h1 class="h3 mb-6">Manage Agenda - {{ event.title }}</h1>
+
+        <form method="POST" id="agenda-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div id="agenda-items" class="mb-6">
+                {% for item in event.agenda %}
+                <div class="agenda-item card bg-surface mb-4 p-4">
+                    <div class="flex items-start gap-4">
+                        <div class="agenda-handle cursor-move text-secondary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="3" y1="15" x2="21" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-wrap gap-4 mb-3">
+                                <div class="form-group" style="width: 120px;">
+                                    <label class="form-label">Time</label>
+                                    <input type="time" name="time[]" value="{{ item.time }}" class="form-control" required>
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" name="agenda_title[]" value="{{ item.title }}" class="form-control" required>
+                                </div>
+                                <div class="form-group" style="width: 200px;">
+                                    <label class="form-label">Speaker</label>
+                                    <select name="speaker_id[]" class="form-control">
+                                        <option value="">-- No Speaker --</option>
+                                        {% for speaker in speakers %}
+                                            <option value="{{ speaker.id }}" {% if item.speaker_id == speaker.id %}selected{% endif %}>{{ speaker.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description (optional)</label>
+                                <textarea name="agenda_description[]" class="form-control" rows="2">{{ item.description or '' }}</textarea>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-ghost btn-sm text-error remove-item">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Empty state - will be replaced when items are added -->
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-agenda-item" class="btn btn-secondary mb-6">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Agenda Item
+            </button>
+
+            <div class="flex gap-3">
+                <button type="submit" class="btn btn-primary">Save Agenda</button>
+                <a href="{{ url_for('events.view_event', event_id=event.id) }}" class="btn btn-ghost">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Template for new agenda item -->
+<template id="agenda-item-template">
+    <div class="agenda-item card bg-surface mb-4 p-4">
+        <div class="flex items-start gap-4">
+            <div class="agenda-handle cursor-move text-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <div class="flex flex-wrap gap-4 mb-3">
+                    <div class="form-group" style="width: 120px;">
+                        <label class="form-label">Time</label>
+                        <input type="time" name="time[]" class="form-control" required>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="agenda_title[]" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="width: 200px;">
+                        <label class="form-label">Speaker</label>
+                        <select name="speaker_id[]" class="form-control">
+                            <option value="">-- No Speaker --</option>
+                            {% for speaker in speakers %}
+                                <option value="{{ speaker.id }}">{{ speaker.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description (optional)</label>
+                    <textarea name="agenda_description[]" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm text-error remove-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('agenda-items');
+    const addBtn = document.getElementById('add-agenda-item');
+    const template = document.getElementById('agenda-item-template');
+
+    // Add new item
+    addBtn.addEventListener('click', function() {
+        const clone = template.content.cloneNode(true);
+        container.appendChild(clone);
+        attachRemoveHandler(container.lastElementChild);
+    });
+
+    // Remove item
+    function attachRemoveHandler(item) {
+        const removeBtn = item.querySelector('.remove-item');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                item.remove();
+            });
+        }
+    }
+
+    // Attach handlers to existing items
+    document.querySelectorAll('.agenda-item').forEach(attachRemoveHandler);
+});
+</script>
+{% endblock %}

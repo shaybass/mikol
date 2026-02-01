@@ -25,6 +25,11 @@ class Event(db.Model):
     category = db.Column(db.String(50))  # Tech, Business, Design, Marketing, etc.
     knowledge_outcomes_json = db.Column(db.Text)  # JSON: ["Learn X", "Understand Y", "Build Z"]
     content_links_json = db.Column(db.Text)  # JSON: [{"type": "slides", "url": "...", "title": "..."}]
+    agenda_json = db.Column(db.Text)  # JSON: [{"time": "09:00", "title": "Opening", "speaker_id": 1, "description": "..."}]
+
+    # Venue/Host information
+    venue_name = db.Column(db.String(200))  # Name of hosting venue/organization
+    venue_url = db.Column(db.String(500))  # Venue website or social link
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -59,6 +64,29 @@ class Event(db.Model):
     def content_links(self, value):
         self.content_links_json = json.dumps(value) if value else None
 
+    @property
+    def agenda(self):
+        """Agenda items: [{"time": "09:00", "title": "Opening", "speaker_id": 1, "description": "..."}]"""
+        if self.agenda_json:
+            return json.loads(self.agenda_json)
+        return []
+
+    @agenda.setter
+    def agenda(self, value):
+        self.agenda_json = json.dumps(value) if value else None
+
+    def get_agenda_with_speakers(self):
+        """Get agenda items with speaker details populated."""
+        from app.models.user import User
+        agenda_items = self.agenda
+        for item in agenda_items:
+            if item.get('speaker_id'):
+                speaker = User.query.get(item['speaker_id'])
+                if speaker:
+                    item['speaker_name'] = speaker.name
+                    item['speaker_avatar'] = speaker.avatar_url
+        return agenda_items
+
     def get_participants_by_role(self):
         """Get participants grouped by role."""
         from app.models.participation import EventParticipation
@@ -78,19 +106,27 @@ class Event(db.Model):
 
     def get_organizers_json(self):
         """Get organizers as JSON-serializable list for certificate snapshot."""
-        participants = self.get_participants_by_role()
-        return [
-            {'user_id': u.id, 'name': u.name, 'avatar_url': u.avatar_url}
-            for u in participants.get('organizer', [])
-        ]
+        from app.models.participation import EventParticipation
+        participations = EventParticipation.query.filter_by(event_id=self.id, role='organizer').all()
+        return [p.get_participant_display() for p in participations]
 
     def get_speakers_json(self):
         """Get speakers as JSON-serializable list for certificate snapshot."""
-        participants = self.get_participants_by_role()
-        return [
-            {'user_id': u.id, 'name': u.name, 'avatar_url': u.avatar_url}
-            for u in participants.get('speaker', [])
-        ]
+        from app.models.participation import EventParticipation
+        participations = EventParticipation.query.filter_by(event_id=self.id, role='speaker').all()
+        return [p.get_participant_display() for p in participations]
+
+    def get_hosts_json(self):
+        """Get hosts as JSON-serializable list for certificate snapshot."""
+        from app.models.participation import EventParticipation
+        participations = EventParticipation.query.filter_by(event_id=self.id, role='host').all()
+        return [p.get_participant_display() for p in participations]
+
+    def get_all_participants_json(self):
+        """Get all participants with their social links for certificate."""
+        from app.models.participation import EventParticipation
+        participations = EventParticipation.query.filter_by(event_id=self.id).all()
+        return [p.get_participant_display() for p in participations if p.display_on_certificate]
 
     def get_knowledge_units_json(self):
         """Get knowledge units as JSON-serializable list for certificate."""
@@ -137,7 +173,12 @@ class Event(db.Model):
                 'date': self.date.isoformat() if self.date else None,
                 'location': self.location,
                 'is_online': self.is_online,
-                'knowledge_outcomes': self.knowledge_outcomes
+                'knowledge_outcomes': self.knowledge_outcomes,
+                'agenda': self.agenda,
+                'venue_name': self.venue_name,
+                'venue_url': self.venue_url,
+                'hosts': self.get_hosts_json(),
+                'all_participants': self.get_all_participants_json()
             }
         )
 

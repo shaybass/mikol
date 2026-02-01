@@ -32,6 +32,8 @@ class EventForm(FlaskForm):
                               validators=[DataRequired()])
     location = StringField('Location', validators=[Optional(), Length(max=300)])
     is_online = BooleanField('Online Event')
+    venue_name = StringField('Venue/Host Name', validators=[Optional(), Length(max=200)])
+    venue_url = StringField('Venue Website/Social', validators=[Optional(), Length(max=500)])
     status = SelectField('Status', choices=[
         ('draft', 'Draft'),
         ('published', 'Published')
@@ -76,6 +78,8 @@ def create_event():
             is_online=form.is_online.data,
             status=form.status.data,
             category=form.category.data or None,
+            venue_name=form.venue_name.data or None,
+            venue_url=form.venue_url.data or None,
             organizer_id=current_user.id
         )
         # Parse knowledge outcomes (one per line)
@@ -150,6 +154,8 @@ def edit_event(event_id):
         event.is_online = form.is_online.data
         event.status = form.status.data
         event.category = form.category.data or None
+        event.venue_name = form.venue_name.data or None
+        event.venue_url = form.venue_url.data or None
 
         # Parse knowledge outcomes
         outcomes_text = form.knowledge_outcomes_text.data
@@ -302,3 +308,83 @@ def event_qr_image(event_id):
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png', as_attachment=False)
+
+
+@events_bp.route('/<int:event_id>/agenda', methods=['GET', 'POST'])
+@login_required
+def manage_agenda(event_id):
+    """Manage event agenda - add/edit agenda items"""
+    event = Event.query.get_or_404(event_id)
+    participation = event.user_participation(current_user.id)
+
+    if not participation or participation.role != 'organizer':
+        flash('Only organizers can manage the agenda.', 'error')
+        return redirect(url_for('events.view_event', event_id=event_id))
+
+    if request.method == 'POST':
+        # Get agenda data from form
+        agenda_items = []
+        times = request.form.getlist('time[]')
+        titles = request.form.getlist('agenda_title[]')
+        descriptions = request.form.getlist('agenda_description[]')
+        speaker_ids = request.form.getlist('speaker_id[]')
+
+        for i in range(len(times)):
+            if times[i] and titles[i]:
+                item = {
+                    'time': times[i],
+                    'title': titles[i],
+                    'description': descriptions[i] if i < len(descriptions) else '',
+                    'speaker_id': int(speaker_ids[i]) if i < len(speaker_ids) and speaker_ids[i] else None
+                }
+                agenda_items.append(item)
+
+        event.agenda = agenda_items
+        db.session.commit()
+
+        flash('Agenda updated!', 'success')
+        return redirect(url_for('events.view_event', event_id=event_id))
+
+    # Get speakers for dropdown
+    participants = event.get_participants_by_role()
+    speakers = participants.get('speaker', [])
+
+    return render_template('events/agenda.html',
+                           event=event,
+                           speakers=speakers)
+
+
+@events_bp.route('/<int:event_id>/my-profile', methods=['GET', 'POST'])
+@login_required
+def update_participation_profile(event_id):
+    """Update participant's social links for this event (self-tagging)"""
+    event = Event.query.get_or_404(event_id)
+    participation = event.user_participation(current_user.id)
+
+    if not participation:
+        flash('You are not a participant of this event.', 'error')
+        return redirect(url_for('events.view_event', event_id=event_id))
+
+    if request.method == 'POST':
+        # Get social links from form
+        social_links = {}
+        if request.form.get('linkedin'):
+            social_links['linkedin'] = request.form.get('linkedin')
+        if request.form.get('twitter'):
+            social_links['twitter'] = request.form.get('twitter')
+        if request.form.get('instagram'):
+            social_links['instagram'] = request.form.get('instagram')
+        if request.form.get('website'):
+            social_links['website'] = request.form.get('website')
+
+        participation.social_links = social_links
+        participation.display_on_certificate = request.form.get('display_on_certificate') == 'on'
+
+        db.session.commit()
+
+        flash('Your profile for this event has been updated!', 'success')
+        return redirect(url_for('events.view_event', event_id=event_id))
+
+    return render_template('events/participation_profile.html',
+                           event=event,
+                           participation=participation)

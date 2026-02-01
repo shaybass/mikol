@@ -2884,3 +2884,141 @@
   margin: 0;
   color: var(--color-info-800);
 }
+
+/* ============================================
+   MVP ADDITIONS - AGENDA & SOCIAL LINKS
+   ============================================ */
+
+/* Agenda Display */
+.agenda-item-view {
+  border-right: 3px solid var(--color-primary);
+}
+
+.agenda-time {
+  font-family: var(--font-mono);
+}
+
+/* Certificate People Section with Social Links */
+.cert-people-section {
+  margin-bottom: var(--space-4);
+}
+
+.cert-people-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.person-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-full);
+}
+
+.person-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.person-social-links {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.social-icon-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.social-icon-sm:hover {
+  color: var(--color-primary);
+}
+
+/* Venue Chip */
+.cert-venue {
+  margin-bottom: var(--space-4);
+}
+
+.venue-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-2);
+}
+
+.venue-chip a {
+  color: var(--color-primary);
+}
+
+/* Mini Agenda in Certificate */
+.agenda-mini-list {
+  margin-top: var(--space-2);
+}
+
+.agenda-mini-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  font-size: var(--font-size-sm);
+}
+
+.agenda-mini-time {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  min-width: 50px;
+}
+
+.agenda-mini-title {
+  color: var(--color-text-secondary);
+}
+
+.agenda-mini-more {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-1);
+}
+
+/* Checkbox Label */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+/* Stats Page */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-4);
+}
+
+.stat-card .stat-value {
+  color: var(--color-primary);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.stat-card .stat-label {
+  font-size: var(--font-size-sm);
+}

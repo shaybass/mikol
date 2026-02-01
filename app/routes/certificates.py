@@ -1,11 +1,36 @@
+import hashlib
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import login_required, current_user
 
 from app import db
-from app.models import Certificate, Library, Activity
+from app.models import Certificate, Library, Activity, CertificateView
 from app.services.certificate_service import get_share_metadata, get_share_text
 
 certificates_bp = Blueprint('certificates', __name__, url_prefix='/certificates')
+
+
+def _get_ip_hash(request):
+    """Get a privacy-safe hash of the user's IP."""
+    ip = request.remote_addr or 'unknown'
+    return hashlib.sha256(ip.encode()).hexdigest()[:32]
+
+
+def _get_referrer_source(referrer):
+    """Parse referrer to determine traffic source."""
+    if not referrer:
+        return 'direct'
+    referrer_lower = referrer.lower()
+    if 'linkedin' in referrer_lower:
+        return 'linkedin'
+    if 'twitter' in referrer_lower or 't.co' in referrer_lower:
+        return 'twitter'
+    if 'facebook' in referrer_lower or 'fb.com' in referrer_lower:
+        return 'facebook'
+    if 'whatsapp' in referrer_lower:
+        return 'whatsapp'
+    if 'instagram' in referrer_lower:
+        return 'instagram'
+    return 'other'
 
 
 @certificates_bp.route('/my')
@@ -19,6 +44,18 @@ def my_certificates():
 @certificates_bp.route('/<share_token>')
 def view_certificate(share_token):
     certificate = Certificate.query.filter_by(share_token=share_token).first_or_404()
+
+    # Track view
+    viewer_id = current_user.id if current_user.is_authenticated else None
+    CertificateView.log_view(
+        certificate_id=certificate.id,
+        viewer_id=viewer_id,
+        view_type='direct',
+        referrer=_get_referrer_source(request.referrer),
+        user_agent=request.user_agent.string[:500] if request.user_agent else None,
+        ip_hash=_get_ip_hash(request)
+    )
+    db.session.commit()
 
     # Check if current user has saved this certificate
     is_saved = False
@@ -38,11 +75,17 @@ def view_certificate(share_token):
         'whatsapp': get_share_metadata(certificate, 'whatsapp')['url'],
     }
 
+    # Get view stats if owner
+    view_stats = None
+    if is_owner:
+        view_stats = CertificateView.get_certificate_stats(certificate.id)
+
     return render_template('certificates/view.html',
                            certificate=certificate,
                            is_saved=is_saved,
                            is_owner=is_owner,
-                           share_links=share_links)
+                           share_links=share_links,
+                           view_stats=view_stats)
 
 
 @certificates_bp.route('/public/<token>')
@@ -57,6 +100,23 @@ def view_public_certificate(token):
     if not certificate.is_public:
         flash('This certificate is private.', 'info')
         return redirect(url_for('events.list_events'))
+
+    # Determine view type from query param or referrer
+    view_source = request.args.get('source', 'public')
+    if view_source not in ['qr_scan', 'social_share', 'public']:
+        view_source = 'public'
+
+    # Track view
+    viewer_id = current_user.id if current_user.is_authenticated else None
+    CertificateView.log_view(
+        certificate_id=certificate.id,
+        viewer_id=viewer_id,
+        view_type=view_source,
+        referrer=_get_referrer_source(request.referrer),
+        user_agent=request.user_agent.string[:500] if request.user_agent else None,
+        ip_hash=_get_ip_hash(request)
+    )
+    db.session.commit()
 
     # Check if user already collected this certificate
     is_collected = False
@@ -76,11 +136,19 @@ def view_public_certificate(token):
         'whatsapp': get_share_metadata(certificate, 'whatsapp')['url'],
     }
 
+    # Get certificate metadata
+    cert_metadata = certificate.cert_metadata or {}
+
     return render_template('certificates/public.html',
                            certificate=certificate,
                            share_links=share_links,
                            is_collected=is_collected,
-                           is_owner=is_owner)
+                           is_owner=is_owner,
+                           agenda=cert_metadata.get('agenda', []),
+                           venue_name=cert_metadata.get('venue_name'),
+                           venue_url=cert_metadata.get('venue_url'),
+                           hosts=cert_metadata.get('hosts', []),
+                           all_participants=cert_metadata.get('all_participants', []))
 
 
 @certificates_bp.route('/<token>/collect', methods=['POST'])
@@ -212,3 +280,26 @@ def save_certificate(cert_id):
     flash('Certificate saved to your library!', 'success')
     return redirect(url_for('certificates.view_certificate',
                             share_token=certificate.share_token))
+
+
+@certificates_bp.route('/<int:cert_id>/stats')
+@login_required
+def certificate_stats(cert_id):
+    """View detailed statistics for a certificate (owner only)."""
+    certificate = Certificate.query.get_or_404(cert_id)
+
+    if certificate.user_id != current_user.id:
+        flash('You can only view stats for your own certificates.', 'error')
+        return redirect(url_for('certificates.my_certificates'))
+
+    stats = CertificateView.get_certificate_stats(cert_id)
+
+    # Get recent views
+    recent_views = CertificateView.query.filter_by(
+        certificate_id=cert_id
+    ).order_by(CertificateView.viewed_at.desc()).limit(50).all()
+
+    return render_template('certificates/stats.html',
+                           certificate=certificate,
+                           stats=stats,
+                           recent_views=recent_views)
