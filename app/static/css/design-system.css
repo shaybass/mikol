@@ -8,32 +8,34 @@
    CSS CUSTOM PROPERTIES (Variables)
    ============================================ */
 :root {
-  /* === Brand Colors === */
-  --color-primary: #2B2D5B;           /* Deep navy from logo */
-  --color-primary-light: #3D4076;     /* Lighter navy */
-  --color-primary-dark: #1E1F40;      /* Darker navy */
+  /* === Brand Colors (from MIKOL Brand Guide) === */
+  --color-primary: #242650;           /* MIKOL - Primary Brand */
+  --color-primary-light: #3A3C6A;     /* Lighter primary */
+  --color-primary-dark: #0E0E2C;      /* ONYX - Dark */
 
-  --color-secondary: #6B5B95;         /* Purple accent */
-  --color-secondary-light: #8B7BB5;   /* Lighter purple */
-  --color-secondary-dark: #524675;    /* Darker purple */
+  --color-secondary: #4E3C80;         /* PURPLISH - Secondary Brand */
+  --color-secondary-light: #6B5B95;   /* Lighter secondary */
+  --color-secondary-dark: #3D2E66;    /* Darker secondary */
 
-  --color-accent: #9B8DC2;            /* Light purple from rays */
-  --color-accent-light: #B8AED4;      /* Even lighter */
+  --color-accent: #8C79B0;            /* LIGHT - Tertiary Brand */
+  --color-accent-light: #A99BC5;      /* Even lighter */
 
-  /* === Neutral Colors === */
+  --color-punch: #D85076;             /* PUNCH - Contrast */
+
+  /* === Neutral Colors (from Brand Guide) === */
   --color-white: #FFFFFF;
-  --color-background: #FFFFFF;
-  --color-surface: #F8F9FC;           /* Slight blue tint */
-  --color-surface-hover: #F0F1F7;
+  --color-background: #FAFCFE;        /* CLOUD - Light */
+  --color-surface: #ECF1F4;           /* DORIAN - Accent */
+  --color-surface-hover: #E2E8ED;
 
-  --color-text-primary: #1A1A2E;
-  --color-text-secondary: #4A4A68;
-  --color-text-tertiary: #6B7280;
-  --color-text-muted: #9CA3AF;
+  --color-text-primary: #0E0E2C;      /* ONYX */
+  --color-text-secondary: #4A4A68;    /* SLATE - Text */
+  --color-text-tertiary: #8C8CA1;     /* LIGHT SLATE - Subtle Text */
+  --color-text-muted: #8C8CA1;        /* LIGHT SLATE */
   --color-text-inverse: #FFFFFF;
 
-  --color-border: #E5E7EB;
-  --color-border-light: #F3F4F6;
+  --color-border: #E5E9EF;
+  --color-border-light: #EEF1F5;
   --color-border-focus: var(--color-primary);
 
   /* === Semantic Colors === */
@@ -59,8 +61,8 @@
   --gradient-hero: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 50%, var(--color-secondary) 100%);
 
   /* === Typography === */
-  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-hebrew: 'Assistant', 'Heebo', var(--font-family-primary);
+  --font-family-primary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-hebrew: 'Poppins', 'Assistant', 'Heebo', sans-serif;
   --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   --font-size-xs: 0.75rem;    /* 12px */
@@ -82,9 +84,9 @@
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.75;
 
-  --letter-spacing-tight: -0.025em;
+  --letter-spacing-tight: -0.02em;    /* -2% per brand guide */
   --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wide: 0.03em;      /* 3% per brand guide (pre-title/button) */
 
   /* === Spacing (8px grid) === */
   --space-0: 0;
@@ -111,12 +113,12 @@
   --radius-full: 9999px;
 
   /* === Shadows === */
-  --shadow-xs: 0 1px 2px rgba(43, 45, 91, 0.05);
-  --shadow-sm: 0 1px 3px rgba(43, 45, 91, 0.08), 0 1px 2px rgba(43, 45, 91, 0.04);
-  --shadow-md: 0 4px 6px rgba(43, 45, 91, 0.07), 0 2px 4px rgba(43, 45, 91, 0.04);
-  --shadow-lg: 0 10px 15px rgba(43, 45, 91, 0.08), 0 4px 6px rgba(43, 45, 91, 0.04);
-  --shadow-xl: 0 20px 25px rgba(43, 45, 91, 0.10), 0 10px 10px rgba(43, 45, 91, 0.04);
-  --shadow-2xl: 0 25px 50px rgba(43, 45, 91, 0.15);
+  --shadow-xs: 0 1px 2px rgba(14, 14, 44, 0.04);
+  --shadow-sm: 0 1px 3px rgba(14, 14, 44, 0.06), 0 1px 2px rgba(14, 14, 44, 0.03);
+  --shadow-md: 0 4px 8px rgba(14, 14, 44, 0.06), 0 2px 4px rgba(14, 14, 44, 0.03);
+  --shadow-lg: 0 8px 24px rgba(14, 14, 44, 0.08), 0 4px 8px rgba(14, 14, 44, 0.03);
+  --shadow-xl: 0 16px 48px rgba(14, 14, 44, 0.10), 0 8px 16px rgba(14, 14, 44, 0.04);
+  --shadow-2xl: 0 24px 64px rgba(14, 14, 44, 0.12);
   --shadow-inner: inset 0 2px 4px rgba(43, 45, 91, 0.05);
   --shadow-focus: 0 0 0 3px rgba(43, 45, 91, 0.15);
   --shadow-focus-primary: 0 0 0 3px rgba(43, 45, 91, 0.25);
@@ -168,9 +170,9 @@ html {
 body {
   font-family: var(--font-family-primary);
   font-size: var(--font-size-base);
-  font-weight: var(--font-weight-normal);
+  font-weight: var(--font-weight-medium);
   line-height: var(--line-height-normal);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   background-color: var(--color-background);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -190,13 +192,13 @@ img, video, svg {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-secondary);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--color-secondary);
+  color: var(--color-accent);
 }
 
 button {
@@ -233,21 +235,24 @@ input, textarea, select {
 
 .h2, h2 {
   font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--color-text-primary);
 }
 
 .h3, h3 {
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--color-text-primary);
 }
 
 .h4, h4 {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--color-text-primary);
 }
 
@@ -363,9 +368,10 @@ input, textarea, select {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-6);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
   line-height: 1;
   text-align: center;
   text-decoration: none;
@@ -375,6 +381,7 @@ input, textarea, select {
   transition: all var(--transition-normal);
   white-space: nowrap;
   user-select: none;
+  min-height: 44px;
 }
 
 .btn:disabled {
@@ -401,21 +408,21 @@ input, textarea, select {
 }
 
 .btn-lg {
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-4) var(--space-8);
   font-size: var(--font-size-base);
   height: 48px;
 }
 
 /* Button Variants */
 .btn-primary {
-  background-color: var(--color-primary);
+  background: var(--gradient-primary);
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-light);
-  border-color: var(--color-primary-light);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
@@ -446,14 +453,14 @@ input, textarea, select {
 }
 
 .btn-danger {
-  background-color: var(--color-error);
+  background-color: var(--color-punch);
   color: var(--color-text-inverse);
-  border-color: var(--color-error);
+  border-color: var(--color-punch);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: var(--color-error-dark);
-  border-color: var(--color-error-dark);
+  background-color: #C04468;
+  border-color: #C04468;
 }
 
 .btn-success {
@@ -496,9 +503,9 @@ input, textarea, select {
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   overflow: hidden;
-  transition: all var(--transition-normal);
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal), border-color var(--transition-normal);
 }
 
 .card-hover:hover {
@@ -568,23 +575,26 @@ input, textarea, select {
   padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background-color: var(--color-white);
+  background-color: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  min-height: 44px;
 }
 
 .form-input:hover,
 .form-select:hover,
 .form-textarea:hover {
-  border-color: var(--color-text-muted);
+  border-color: var(--color-accent);
+  background-color: var(--color-white);
 }
 
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-focus-primary);
+  background-color: var(--color-white);
+  box-shadow: 0 0 0 3px rgba(36, 38, 80, 0.08);
 }
 
 .form-input::placeholder,
@@ -760,9 +770,10 @@ input, textarea, select {
   top: 0;
   z-index: var(--z-sticky);
   height: var(--header-height);
-  background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .navbar-inner {
@@ -1493,4 +1504,68 @@ input, textarea, select {
 
 @media (min-width: 1024px) {
   .hide-desktop { display: none !important; }
+}
+
+/* ============================================
+   PAGE FADE-IN ANIMATION
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.main-content {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* ============================================
+   MICRO-INTERACTIONS
+   ============================================ */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width var(--transition-normal), left var(--transition-normal);
+  border-radius: 1px;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+  left: 0;
+}
+
+a:not(.btn):not(.nav-link) {
+  transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.badge {
+  transition: transform var(--transition-fast);
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+.avatar {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
 }

@@ -114,6 +114,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  border-radius: var(--radius-lg);
 }
 
 .event-card-image {
@@ -817,11 +818,12 @@
 
 .auth-card {
   width: 100%;
-  max-width: 400px;
-  padding: var(--space-8);
+  max-width: 420px;
+  padding: var(--space-10);
   background: var(--color-white);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
 }
 
 .auth-header {
@@ -829,9 +831,14 @@
   margin-bottom: var(--space-8);
 }
 
+.auth-title {
+  letter-spacing: var(--letter-spacing-tight);
+}
+
 .auth-logo {
-  height: 48px;
-  margin-bottom: var(--space-4);
+  height: 44px;
+  margin: 0 auto var(--space-6);
+  display: block;
 }
 
 .auth-title {
@@ -1472,23 +1479,24 @@
    ============================================ */
 .landing-hero {
   text-align: center;
-  padding: var(--space-12) 0 var(--space-8);
+  padding: var(--space-20) 0 var(--space-16);
 }
 
 .landing-hero-title {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
-  line-height: 1.2;
+  line-height: 1.15;
   margin-bottom: var(--space-6);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .landing-hero-subtitle {
   font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
-  max-width: 600px;
-  margin: 0 auto var(--space-8);
-  line-height: 1.6;
+  max-width: 540px;
+  margin: 0 auto var(--space-10);
+  line-height: var(--line-height-relaxed);
 }
 
 .landing-hero-actions {
@@ -1499,7 +1507,7 @@
 }
 
 .landing-section {
-  padding: var(--space-12) 0;
+  padding: var(--space-16) 0;
   text-align: center;
 }
 
@@ -1622,16 +1630,17 @@
 }
 
 .landing-role-card {
-  padding: var(--space-6);
+  padding: var(--space-8) var(--space-6);
   background: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  transition: all var(--transition-normal);
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal), border-color var(--transition-normal);
 }
 
 .landing-role-card:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  border-color: var(--color-accent-light);
 }
 
 .landing-role-icon {
@@ -1697,11 +1706,17 @@
 .dashboard-stat-card {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  gap: var(--space-4);
+  padding: var(--space-5);
   background: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+.dashboard-stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .dashboard-stat-icon {
