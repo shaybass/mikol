@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Certificate - MIKOL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #FAFCFE;
+            color: #0E0E2C;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .verify-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(36, 38, 80, 0.10);
+            max-width: 520px;
+            width: 90%;
+            padding: 48px 36px;
+            text-align: center;
+        }
+        .verify-icon { font-size: 56px; margin-bottom: 16px; }
+        .verify-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #242650;
+            margin-bottom: 8px;
+        }
+        .verify-subtitle {
+            font-size: 0.95rem;
+            color: #6b7280;
+            margin-bottom: 28px;
+        }
+        .verify-details {
+            text-align: start;
+            background: #FAFCFE;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+        .verify-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+        }
+        .verify-row:last-child { border-bottom: none; }
+        .verify-label { color: #6b7280; font-weight: 500; }
+        .verify-value { color: #242650; font-weight: 600; }
+        .badge-revoked {
+            display: inline-block;
+            background: #D85076;
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .brand {
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+        .brand strong { color: #4E3C80; }
+        .error-card .verify-title { color: #D85076; }
+        .dark-toggle {
+            position: fixed; top: 12px; left: 12px; z-index: 100;
+            background: none; border: none; cursor: pointer;
+            color: #242650; font-size: 20px; padding: 8px;
+            border-radius: 8px; transition: background 0.2s;
+        }
+        .dark-toggle:hover { background: rgba(0,0,0,0.06); }
+        html.dark .dark-toggle { color: #FAFCFE; }
+        html.dark .dark-toggle:hover { background: rgba(255,255,255,0.1); }
+        html.dark body { background: #0E0E2C; color: #FAFCFE; }
+        html.dark .verify-card { background: #161638; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+        html.dark .verify-title { color: #FAFCFE; }
+        html.dark .verify-subtitle { color: #9898b8; }
+        html.dark .verify-details { background: #1a1a3e; }
+        html.dark .verify-row { border-bottom-color: #2a2a55; }
+        html.dark .verify-label { color: #9898b8; }
+        html.dark .verify-value { color: #FAFCFE; }
+        html.dark .brand { color: #7878a0; }
+        html.dark .brand strong { color: #a99bc5; }
+        html.dark .error-card .verify-title { color: #f87171; }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" id="darkToggle" aria-label="Toggle dark mode">🌙</button>
+    <script>
+        (function(){
+            if(localStorage.getItem('mikol-dark-mode')==='true') document.documentElement.classList.add('dark');
+            var btn=document.getElementById('darkToggle');
+            function upd(){btn.textContent=document.documentElement.classList.contains('dark')?'☀️':'🌙';}
+            upd();
+            btn.addEventListener('click',function(){
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('mikol-dark-mode',document.documentElement.classList.contains('dark'));
+                upd();
+            });
+        })();
+    </script>
+    {% if certificate %}
+        <div class="verify-card {% if certificate.status == 'revoked' %}error-card{% endif %}">
+            {% if certificate.status == 'revoked' %}
+                <div class="verify-icon">⚠️</div>
+                <h1 class="verify-title">Certificate Revoked</h1>
+                <p class="verify-subtitle">This certificate has been revoked and is no longer valid.</p>
+                <span class="badge-revoked">Revoked</span>
+            {% else %}
+                <div class="verify-icon">✅</div>
+                <h1 class="verify-title">Certificate #{{ certificate.id }} is Valid</h1>
+                <p class="verify-subtitle">This certificate has been verified by MIKOL</p>
+            {% endif %}
+            <div class="verify-details">
+                <div class="verify-row">
+                    <span class="verify-label">Event</span>
+                    <span class="verify-value">{{ certificate.title or certificate.event.title }}</span>
+                </div>
+                <div class="verify-row">
+                    <span class="verify-label">Date</span>
+                    <span class="verify-value">{{ certificate.event.date.strftime('%b %d, %Y') if certificate.event.date else 'N/A' }}</span>
+                </div>
+                <div class="verify-row">
+                    <span class="verify-label">Issued To</span>
+                    <span class="verify-value">{{ certificate.user.name }}</span>
+                </div>
+                <div class="verify-row">
+                    <span class="verify-label">Role</span>
+                    <span class="verify-value">{{ certificate.get_role_display() }}</span>
+                </div>
+                {% if certificate.organizers %}
+                <div class="verify-row">
+                    <span class="verify-label">Organized By</span>
+                    <span class="verify-value">{{ certificate.organizers[0].get('name', 'N/A') if certificate.organizers else 'N/A' }}</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="brand">Verified via <strong>MIKOL</strong> — Knowledge Identity Platform</div>
+        </div>
+    {% else %}
+        <div class="verify-card error-card">
+            <div class="verify-icon">❌</div>
+            <h1 class="verify-title">Certificate Not Found</h1>
+            <p class="verify-subtitle">The verification link is invalid or the certificate does not exist.</p>
+            <div class="brand">Powered by <strong>MIKOL</strong></div>
+        </div>
+    {% endif %}
+</body>
+</html>

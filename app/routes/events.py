@@ -272,6 +272,45 @@ def add_knowledge_unit(event_id):
     return render_template('events/add_knowledge.html', form=form, event=event)
 
 
+@events_bp.route('/<int:event_id>/toggle-collection', methods=['POST'])
+@login_required
+def toggle_collection(event_id):
+    event = Event.query.get_or_404(event_id)
+    if event.organizer_id != current_user.id:
+        abort(403)
+
+    if event.collection_open:
+        event.collection_open = False
+    else:
+        event.collection_open = True
+        event.collection_opened_at = datetime.utcnow()
+
+    db.session.commit()
+
+    status = 'open' if event.collection_open else 'closed'
+    flash(f'Collection {status}!', 'success')
+    return redirect(url_for('events.view_event', event_id=event.id))
+
+
+@events_bp.route('/<int:event_id>/collection-qr.png')
+def collection_qr_image(event_id):
+    """Generate QR code for collection URL."""
+    import qrcode
+    event = Event.query.get_or_404(event_id)
+
+    collect_url = request.host_url.rstrip('/') + f'/collect/{event.collection_code}'
+
+    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+    qr.add_data(collect_url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='#242650', back_color='white')
+
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png', as_attachment=False)
+
+
 @events_bp.route('/<int:event_id>/qr')
 def event_qr(event_id):
     """Show QR code page for event"""

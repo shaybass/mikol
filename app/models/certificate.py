@@ -1,6 +1,7 @@
 from datetime import datetime
 import secrets
 import json
+import uuid
 
 from flask import current_app
 from app import db
@@ -32,6 +33,13 @@ class Certificate(db.Model):
     share_token = db.Column(db.String(64), unique=True, nullable=False, index=True)
     is_public = db.Column(db.Boolean, default=True)
 
+    # Phase 2: Visibility & Status
+    visibility = db.Column(db.String(20), default='public', nullable=False)  # public, unlisted, private
+    status = db.Column(db.String(20), default='active', nullable=False)  # active, revoked, flagged
+    verification_hash = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    user_tags = db.Column(db.Text)  # JSON array of user's personal tags
+    snapshot_data = db.Column(db.Text)  # JSON snapshot of event data at issuance time
+
     # Metadata for categorization & filtering
     metadata_json = db.Column(db.Text)  # JSON: {category, skills, tags, location, date}
 
@@ -48,6 +56,12 @@ class Certificate(db.Model):
         super().__init__(**kwargs)
         if not self.share_token:
             self.share_token = secrets.token_urlsafe(32)
+        if not self.verification_hash:
+            self.verification_hash = uuid.uuid4().hex
+        if not self.visibility:
+            self.visibility = 'public'
+        if not self.status:
+            self.status = 'active'
 
     # JSON property helpers
     @property
@@ -89,6 +103,42 @@ class Certificate(db.Model):
     @cert_metadata.setter
     def cert_metadata(self, value):
         self.metadata_json = json.dumps(value) if value else None
+
+    @property
+    def tags(self):
+        if self.user_tags:
+            return json.loads(self.user_tags)
+        return []
+
+    @tags.setter
+    def tags(self, value):
+        self.user_tags = json.dumps(value) if value else None
+
+    @property
+    def snapshot(self):
+        if self.snapshot_data:
+            return json.loads(self.snapshot_data)
+        return {}
+
+    @snapshot.setter
+    def snapshot(self, value):
+        self.snapshot_data = json.dumps(value) if value else None
+
+    def take_event_snapshot(self):
+        """Capture immutable snapshot of event data at issuance time."""
+        event = self.event
+        self.snapshot = {
+            'event_name': event.title,
+            'event_date': event.date.isoformat() if event.date else None,
+            'organizer': event.organizer.name if event.organizer else None,
+            'category': event.category if hasattr(event, 'category') else None,
+            'location': event.location if hasattr(event, 'location') else None,
+        }
+
+    def generate_verification_url(self):
+        """Generate the public verification URL."""
+        base_url = current_app.config.get('BASE_URL', 'http://localhost:5001')
+        return f"{base_url}/verify/{self.verification_hash}"
 
     def generate_share_url(self):
         """Generate the public shareable URL for this certificate."""

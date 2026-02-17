@@ -49,21 +49,33 @@ def create_app(config_name='default'):
     from app.routes.profiles import profiles_bp
     from app.routes.certificates import certificates_bp
     from app.routes.library import library_bp
-    from app.routes.feed import feed_bp
     from app.routes.scan import scan_bp
     from app.routes.settings import settings_bp
+    from app.routes.collect import collect_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(events_bp)
     app.register_blueprint(profiles_bp)
     app.register_blueprint(certificates_bp)
     app.register_blueprint(library_bp)
-    app.register_blueprint(feed_bp)
     app.register_blueprint(scan_bp)
     app.register_blueprint(settings_bp)
+    app.register_blueprint(collect_bp)
 
     from app.routes.dashboard import dashboard_bp
     app.register_blueprint(dashboard_bp)
+
+    @app.route('/verify/<verification_hash>')
+    def verify_certificate(verification_hash):
+        from flask import render_template
+        cert = Certificate.query.filter_by(verification_hash=verification_hash).first()
+        return render_template('certificates/verify.html', certificate=cert)
+
+    @app.route('/p/<int:user_id>')
+    def profile_shortlink(user_id):
+        from flask import redirect, url_for, request
+        # Forward query params
+        return redirect(url_for('profiles.view_profile', user_id=user_id, **request.args))
 
     @app.route('/')
     def index():

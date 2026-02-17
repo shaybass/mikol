@@ -1,5 +1,7 @@
 from datetime import datetime
 import json
+import secrets
+import string
 
 from app import db
 
@@ -30,6 +32,12 @@ class Event(db.Model):
     # Venue/Host information
     venue_name = db.Column(db.String(200))  # Name of hosting venue/organization
     venue_url = db.Column(db.String(500))  # Venue website or social link
+
+    # Collection fields
+    collection_code = db.Column(db.String(20), unique=True, nullable=True, index=True)
+    collection_open = db.Column(db.Boolean, default=False)
+    collection_window_minutes = db.Column(db.Integer, default=60)
+    collection_opened_at = db.Column(db.DateTime, nullable=True)
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -86,6 +94,36 @@ class Event(db.Model):
                     item['speaker_name'] = speaker.name
                     item['speaker_avatar'] = speaker.avatar_url
         return agenda_items
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not self.collection_code:
+            self.collection_code = self._generate_collection_code()
+
+    @staticmethod
+    def _generate_collection_code():
+        chars = string.ascii_lowercase + string.digits
+        while True:
+            code = ''.join(secrets.choice(chars) for _ in range(8))
+            if not Event.query.filter_by(collection_code=code).first():
+                return code
+
+    @property
+    def is_collection_active(self):
+        """Check if collection is currently open (manual override or within window)."""
+        if not self.collection_open:
+            return False
+        if self.collection_opened_at and self.collection_window_minutes:
+            from datetime import timedelta
+            deadline = self.collection_opened_at + timedelta(minutes=self.collection_window_minutes)
+            if datetime.utcnow() > deadline:
+                return False
+        return True
+
+    @property
+    def collection_count(self):
+        """Number of certificates issued for this event."""
+        return self.certificates.count()
 
     def get_participants_by_role(self):
         """Get participants grouped by role."""

@@ -42,6 +42,7 @@ class User(UserMixin, db.Model):
     facebook_connected = db.Column(db.Boolean, default=False)
     facebook_token = db.Column(db.Text)
 
+    language = db.Column(db.String(5), default='he')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships

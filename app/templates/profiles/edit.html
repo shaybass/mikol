@@ -57,6 +57,12 @@
                 {{ form.cover_url(class="form-input", placeholder="https://...", id="cover_url") }}
             </div>
 
+            <div class="form-group">
+                <label class="form-label" for="language">Language / שפה</label>
+                {{ form.language(class="form-select", id="language") }}
+                <p class="form-hint">בחר שפת תצוגה / Choose display language</p>
+            </div>
+
             <hr style="margin: var(--space-5) 0; border-color: var(--color-border);">
 
             <h3 class="h5 mb-4">Value Proposition (Optional)</h3>

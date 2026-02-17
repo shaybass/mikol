@@ -26,17 +26,6 @@
         </div>
     </div>
     <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon" style="background: rgba(107, 91, 149, 0.1); color: var(--color-secondary);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-        </div>
-        <div class="dashboard-stat-content">
-            <span class="dashboard-stat-value">{{ stats.knowledge_score }}</span>
-            <span class="dashboard-stat-label">Knowledge Score</span>
-        </div>
-    </div>
-    <div class="dashboard-stat-card">
         <div class="dashboard-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success);">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
@@ -128,6 +117,64 @@
         </div>
         {% endif %}
     </div>
+
+    <!-- Organizer Section -->
+    {% if organized_events %}
+    <div class="dashboard-main" style="grid-column: 1 / -1;">
+        <div class="card mb-6">
+            <div class="card-body">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="h4">🎯 Organizer Dashboard</h2>
+                    <span class="badge badge-primary">{{ monthly_issued }} certificates this month</span>
+                </div>
+
+                <div class="table-responsive" style="overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--color-border, #e5e7eb); text-align:left;">
+                                <th style="padding:0.75rem 0.5rem;">Event</th>
+                                <th style="padding:0.75rem 0.5rem;">Date</th>
+                                <th style="padding:0.75rem 0.5rem;">Status</th>
+                                <th style="padding:0.75rem 0.5rem;">Certificates</th>
+                                <th style="padding:0.75rem 0.5rem;">Collection</th>
+                                <th style="padding:0.75rem 0.5rem;">Export</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in organized_events %}
+                            <tr style="border-bottom:1px solid var(--color-border, #f3f4f6);">
+                                <td style="padding:0.75rem 0.5rem;">
+                                    <a href="{{ url_for('events.view_event', event_id=event.id) }}" class="text-primary" style="text-decoration:none; font-weight:500;">{{ event.title }}</a>
+                                </td>
+                                <td style="padding:0.75rem 0.5rem;">{{ event.date.strftime('%d.%m.%Y') }}</td>
+                                <td style="padding:0.75rem 0.5rem;">
+                                    <span class="badge badge-{{ 'success' if event.status == 'published' else 'warning' if event.status == 'draft' else 'info' }}">{{ event.status }}</span>
+                                </td>
+                                <td style="padding:0.75rem 0.5rem;">{{ event.collection_count }}</td>
+                                <td style="padding:0.75rem 0.5rem;">
+                                    <form action="{{ url_for('events.toggle_collection', event_id=event.id) }}" method="POST" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm {{ 'btn-punch' if event.collection_open else 'btn-ghost' }}" style="font-size:0.8rem; padding:0.25rem 0.75rem;">
+                                            {{ '🟢 Open' if event.collection_open else '🔴 Closed' }}
+                                        </button>
+                                    </form>
+                                </td>
+                                <td style="padding:0.75rem 0.5rem;">
+                                    {% if event.collection_count > 0 %}
+                                        <a href="{{ url_for('dashboard.export_csv', event_id=event.id) }}" class="btn btn-ghost btn-sm" style="font-size:0.8rem; padding:0.25rem 0.75rem;">📥 CSV</a>
+                                    {% else %}
+                                        <span style="color:#aaa; font-size:0.8rem;">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Sidebar -->
     <div class="dashboard-sidebar">

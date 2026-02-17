@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.models import Certificate, Library, Activity, CertificateView
+from app.models.event import Event
 from app.services.certificate_service import get_share_metadata, get_share_text
 
 certificates_bp = Blueprint('certificates', __name__, url_prefix='/certificates')
@@ -303,3 +304,43 @@ def certificate_stats(cert_id):
                            certificate=certificate,
                            stats=stats,
                            recent_views=recent_views)
+
+
+# ── Phase 2: Visibility, Verification, Revoke ──────────────────────────
+
+@certificates_bp.route('/<int:cert_id>/visibility', methods=['POST'])
+@login_required
+def update_visibility(cert_id):
+    """AJAX endpoint to change certificate visibility."""
+    certificate = Certificate.query.get_or_404(cert_id)
+    if certificate.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json(silent=True) or {}
+    new_visibility = data.get('visibility', '').strip().lower()
+    if new_visibility not in ('public', 'unlisted', 'private'):
+        return jsonify({'error': 'Invalid visibility value'}), 400
+
+    certificate.visibility = new_visibility
+    # Keep legacy field in sync
+    certificate.is_public = (new_visibility == 'public')
+    db.session.commit()
+    return jsonify({'ok': True, 'visibility': certificate.visibility})
+
+
+@certificates_bp.route('/<int:cert_id>/revoke', methods=['POST'])
+@login_required
+def revoke_certificate(cert_id):
+    """Organizer revokes a certificate (never deleted)."""
+    certificate = Certificate.query.get_or_404(cert_id)
+    # Only the event organizer or certificate owner can revoke
+    event = certificate.event
+    if current_user.id != event.organizer_id and current_user.id != certificate.user_id:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    certificate.status = 'revoked'
+    db.session.commit()
+    if request.is_json:
+        return jsonify({'ok': True, 'status': 'revoked'})
+    flash('Certificate has been revoked.', 'warning')
+    return redirect(url_for('certificates.my_certificates'))

@@ -3,139 +3,115 @@
 {% block title %}{{ profile_user.name }} - MIKOL{% endblock %}
 
 {% block content %}
-<!-- Profile Header -->
-<div class="profile-header-simple">
-    <div class="profile-cover-simple">
-        {% if profile_user.cover_url %}
-            <img src="{{ profile_user.cover_url }}" alt="Cover">
+<div style="max-width:600px; margin:0 auto; padding:1rem;">
+
+    <!-- Header -->
+    <div style="text-align:center; margin-bottom:1.5rem;">
+        <div class="avatar avatar-xl" style="margin:0 auto 1rem; width:96px; height:96px; font-size:2.5rem;">
+            {% if profile_user.avatar_url %}
+                <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.name }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            {% else %}
+                {{ profile_user.name[0].upper() }}
+            {% endif %}
+        </div>
+        <h1 style="font-family:'Poppins',sans-serif; font-size:1.5rem; font-weight:700; color:#242650; margin:0;">{{ profile_user.name }}</h1>
+        {% if profile_user.professional_title %}
+            <p style="color:#4E3C80; font-size:1rem; margin:0.25rem 0 0;">{{ profile_user.professional_title }}</p>
         {% endif %}
     </div>
-    <div class="profile-info-simple">
-        <div class="profile-avatar-simple">
-            <div class="avatar avatar-xl">
-                {% if profile_user.avatar_url %}
-                    <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.name }}">
-                {% else %}
-                    {{ profile_user.name[0].upper() }}
-                {% endif %}
-            </div>
-        </div>
-        <div class="profile-details-simple">
-            <h1 class="profile-name-simple">{{ profile_user.name }}</h1>
-            {% if profile_user.professional_title %}
-                <p class="profile-title-simple">{{ profile_user.professional_title }}</p>
-            {% endif %}
-            {% if profile_user.activity_area %}
-                <p class="profile-area-simple">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    {{ profile_user.activity_area }}
-                </p>
-            {% endif %}
-        </div>
-        <div class="profile-actions-simple">
-            {% if current_user.is_authenticated %}
-                {% if current_user.id == profile_user.id %}
-                    <a href="{{ url_for('profiles.edit_profile') }}" class="btn btn-secondary btn-sm">Edit Profile</a>
-                {% else %}
-                    <button class="btn {% if is_following %}btn-secondary{% else %}btn-primary{% endif %} btn-sm btn-follow" data-user-id="{{ profile_user.id }}">
-                        {% if is_following %}Following{% else %}Follow{% endif %}
-                    </button>
-                {% endif %}
-            {% endif %}
+
+    <!-- Actions -->
+    <div style="text-align:center; margin-bottom:1.5rem; display:flex; gap:0.5rem; justify-content:center;">
+        {% if current_user.is_authenticated and current_user.id == profile_user.id %}
+            <a href="{{ url_for('profiles.edit_profile') }}" class="btn btn-secondary btn-sm">✏️ Edit Profile</a>
+        {% endif %}
+        <button onclick="navigator.clipboard.writeText(window.location.href).then(()=>this.textContent='✅ Copied!')" class="btn btn-ghost btn-sm" style="cursor:pointer;">🔗 Share Profile</button>
+    </div>
+
+    <!-- Stats -->
+    <div style="text-align:center; margin-bottom:2rem;">
+        <div style="display:inline-block; background:#f8f7ff; border-radius:12px; padding:1rem 2rem;">
+            <span style="font-size:2rem; font-weight:700; color:#242650;">{{ total_events }}</span>
+            <br>
+            <span style="font-size:0.85rem; color:#666;">Events Collected</span>
         </div>
     </div>
-</div>
 
-<!-- Social Proof Line -->
-<div class="social-proof-line">
-    <span class="social-proof-item">
-        <strong>{{ profile_user.certificates_count }}</strong> certificates
-    </span>
-    <span class="social-proof-divider">·</span>
-    <span class="social-proof-item">
-        <strong>{{ profile_user.followers_count }}</strong> followers
-    </span>
-    <span class="social-proof-divider">·</span>
-    <span class="social-proof-item">
-        <strong>{{ profile_user.following_count }}</strong> following
-    </span>
-</div>
-
-<!-- Interests Tags -->
-{% if profile_user.interests %}
-<div class="interests-section">
-    <div class="interests-tags">
-        {% for interest in profile_user.interests %}
-            <span class="interest-tag">{{ interest }}</span>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
-
-<!-- Value Proposition (Optional) -->
-{% if profile_user.value_proposition %}
-<div class="value-proposition-card">
-    {% if profile_user.value_proposition_title %}
-        <h3 class="value-proposition-title">{{ profile_user.value_proposition_title }}</h3>
-    {% endif %}
-    <p class="value-proposition-text">{{ profile_user.value_proposition }}</p>
-    {% if profile_user.show_contact_cta %}
-        <a href="mailto:{{ profile_user.email }}" class="btn btn-primary btn-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            Contact me
-        </a>
-    {% endif %}
-</div>
-{% endif %}
-
-<!-- Certificate Library -->
-<div class="certificate-library-section">
-    <h2 class="section-title">Certificate Library</h2>
-
-    {% set all_certs = [] %}
-    {% for role in ['organizer', 'speaker', 'host', 'participant'] %}
-        {% for cert in certificates_by_role[role] %}
-            {% set _ = all_certs.append(cert) %}
-        {% endfor %}
-    {% endfor %}
-
-    {% if all_certs or certificates_by_role.organizer or certificates_by_role.speaker or certificates_by_role.host or certificates_by_role.participant %}
-        <div class="cert-grid-simple">
-            {% for role in ['organizer', 'speaker', 'host', 'participant'] %}
-                {% for cert in certificates_by_role[role] %}
-                    <a href="{{ url_for('certificates.view_certificate', share_token=cert.share_token) }}" class="cert-card-simple">
-                        {% if cert.event.image_url %}
-                            <img src="{{ cert.event.image_url }}" alt="{{ cert.title or cert.event.title }}" class="cert-card-image">
-                        {% else %}
-                            <div class="cert-card-placeholder">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <circle cx="12" cy="8" r="7"></circle>
-                                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                                </svg>
-                            </div>
-                        {% endif %}
-                        <div class="cert-card-info">
-                            <span class="cert-card-role-badge role-{{ cert.role }}">{{ cert.get_role_display() }}</span>
-                            <h4 class="cert-card-title-simple">{{ cert.title or cert.event.title }}</h4>
-                            <p class="cert-card-date-simple">{{ cert.event.date.strftime('%d.%m.%Y') }}</p>
-                        </div>
-                    </a>
-                {% endfor %}
+    <!-- Breakdown: Categories -->
+    {% if category_breakdown %}
+    <div style="margin-bottom:1.5rem;">
+        <h3 style="font-size:0.85rem; color:#888; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">By Category</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;" dir="rtl">
+            {% for cat, count in category_breakdown %}
+                <span style="background:#f0edf7; color:#4E3C80; padding:0.35rem 0.75rem; border-radius:20px; font-size:0.85rem; font-weight:500;">{{ cat }} ×{{ count }}</span>
             {% endfor %}
         </div>
-    {% else %}
-        <div class="empty-state-simple">
-            <p>No certificates yet</p>
-            {% if current_user.is_authenticated and current_user.id == profile_user.id %}
-                <a href="{{ url_for('events.list_events') }}" class="btn btn-primary btn-sm">Discover Events</a>
-            {% endif %}
-        </div>
+    </div>
     {% endif %}
+
+    <!-- Breakdown: Years -->
+    {% if year_breakdown %}
+    <div style="margin-bottom:1.5rem;">
+        <h3 style="font-size:0.85rem; color:#888; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">By Year</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+            {% for year, count in year_breakdown %}
+                <span style="background:#e8f4f8; color:#242650; padding:0.35rem 0.75rem; border-radius:20px; font-size:0.85rem; font-weight:500;">{{ year }} ×{{ count }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Breakdown: Roles -->
+    {% if role_breakdown %}
+    <div style="margin-bottom:2rem;">
+        <h3 style="font-size:0.85rem; color:#888; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">By Role</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;" dir="rtl">
+            {% for role, count in role_breakdown %}
+                <span style="background:#fdf0f3; color:#D85076; padding:0.35rem 0.75rem; border-radius:20px; font-size:0.85rem; font-weight:500;">{{ role }} ×{{ count }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Active Filters -->
+    {% if filter_category or filter_year or filter_role %}
+    <div style="margin-bottom:1rem; padding:0.75rem; background:#fff8e1; border-radius:8px; font-size:0.85rem;">
+        🔍 Filtered:
+        {% if filter_category %}<strong>{{ filter_category }}</strong>{% endif %}
+        {% if filter_year %}<strong>{{ filter_year }}</strong>{% endif %}
+        {% if filter_role %}<strong>{{ filter_role }}</strong>{% endif %}
+        &mdash; <a href="{{ url_for('profiles.view_profile', user_id=profile_user.id) }}" style="color:#D85076;">Clear filters</a>
+    </div>
+    {% endif %}
+
+    <!-- Public Certificates -->
+    <div>
+        <h3 style="font-size:0.85rem; color:#888; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">Public Certificates</h3>
+
+        {% if public_certs %}
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            {% for cert in public_certs %}
+            <a href="{{ url_for('certificates.view_certificate', share_token=cert.share_token) }}" style="text-decoration:none; display:flex; align-items:center; gap:1rem; padding:0.75rem; background:#fff; border:1px solid #eee; border-radius:10px; transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='none'">
+                {% if cert.event.image_url %}
+                    <img src="{{ cert.event.image_url }}" style="width:48px; height:48px; border-radius:8px; object-fit:cover;" alt="">
+                {% else %}
+                    <div style="width:48px; height:48px; border-radius:8px; background:#f0edf7; display:flex; align-items:center; justify-content:center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4E3C80" stroke-width="1.5"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                    </div>
+                {% endif %}
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:600; color:#242650; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ cert.title or cert.event.title }}</div>
+                    <div style="font-size:0.8rem; color:#888;">{{ cert.get_role_display() }} · {{ cert.event.date.strftime('%d.%m.%Y') }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:2rem; color:#aaa;">
+            <p>No public certificates yet</p>
+        </div>
+        {% endif %}
+    </div>
+
 </div>
 {% endblock %}

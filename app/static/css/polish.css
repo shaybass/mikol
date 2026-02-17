@@ -623,3 +623,277 @@ a, button, .btn, .card, input, select, textarea, .nav-link, .badge {
 .sidebar-item:hover {
   background: rgba(36, 38, 80, 0.03);
 }
+
+/* ============================================
+   DARK MODE OVERRIDES (Polish)
+   ============================================ */
+html.dark .navbar {
+  background-color: rgba(14, 14, 44, 0.9);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-bottom: 1px solid var(--color-border);
+}
+
+html.dark .bottom-nav {
+  background-color: rgba(14, 14, 44, 0.95);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-top: 1px solid var(--color-border);
+}
+
+html.dark .btn-primary {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .btn-primary:hover:not(:disabled) {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .btn-google {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+html.dark .btn-google:hover {
+  background: var(--color-surface-hover);
+  border-color: #4a4a7a;
+}
+
+html.dark .auth-page {
+  background: linear-gradient(135deg, #0E0E2C 0%, #161638 100%);
+}
+
+html.dark .auth-card {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .mobile-drawer {
+  background-color: var(--color-white);
+}
+
+html.dark .mobile-drawer-header {
+  border-bottom-color: var(--color-border);
+}
+
+html.dark .mobile-drawer-divider {
+  background-color: var(--color-border);
+}
+
+html.dark .mobile-drawer-link:hover {
+  background-color: var(--color-surface);
+}
+
+html.dark .event-card-footer {
+  border-top-color: var(--color-border);
+}
+
+html.dark .dashboard-stat-card {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .dashboard-stat-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+html.dark .landing-role-card {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .landing-role-card:hover {
+  border-color: #4a4a7a;
+}
+
+html.dark .landing-step-icon {
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-hover) 100%);
+}
+
+html.dark .profile-header-simple {
+  background: var(--color-white);
+}
+
+html.dark .profile-avatar-simple .avatar,
+html.dark .profile-avatar {
+  border-color: var(--color-white);
+}
+
+html.dark .social-proof-line {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .interest-tag {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+html.dark .value-proposition-card {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .certificate-library-section {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .cert-card-simple {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+html.dark .knowledge-outcomes-section {
+  background: linear-gradient(135deg, rgba(140, 121, 176, 0.08), rgba(78, 60, 128, 0.08));
+  border-color: var(--color-border);
+}
+
+html.dark .knowledge-item {
+  background: var(--color-surface);
+}
+
+html.dark .knowledge-icon {
+  background: var(--color-surface-hover);
+}
+
+html.dark .scanner-option {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .scanner-option:hover {
+  border-color: var(--color-accent);
+}
+
+html.dark .scanner-option-icon {
+  background: var(--color-surface);
+}
+
+html.dark .feed-item {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .feed-event-card {
+  background: var(--color-surface);
+}
+
+html.dark .feed-event-card:hover {
+  background: var(--color-surface-hover);
+}
+
+html.dark .activity-content {
+  background: var(--color-surface);
+}
+
+html.dark .activity-icon {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .participant-chip {
+  background: var(--color-surface);
+}
+
+html.dark .participant-chip:hover {
+  background: var(--color-surface-hover);
+}
+
+html.dark .copy-link-input {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+html.dark .library-stats {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+html.dark .filter-select {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+html.dark .search-input {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+html.dark .qr-container {
+  background: var(--color-white);
+}
+
+html.dark .qr-code {
+  background: #fff;
+}
+
+html.dark .cert-display {
+  background: var(--color-white);
+  border-color: var(--color-accent);
+}
+
+html.dark .cert-event-section {
+  background: var(--color-surface);
+}
+
+html.dark .cert-person-chip {
+  background: var(--color-surface);
+  color: #a99bc5;
+}
+
+html.dark .cert-person-chip:hover {
+  background: var(--color-surface-hover);
+}
+
+html.dark .cert-knowledge-item {
+  background: var(--color-surface);
+}
+
+html.dark .social-connection-card {
+  background: var(--color-white);
+}
+
+html.dark .social-connection-icon.linkedin { background: rgba(10, 102, 194, 0.15); }
+html.dark .social-connection-icon.twitter { background: rgba(255, 255, 255, 0.08); }
+html.dark .social-connection-icon.facebook { background: rgba(24, 119, 242, 0.15); }
+
+html.dark .share-network-btn {
+  background: var(--color-white);
+  color: var(--color-text-primary);
+}
+
+html.dark .share-text-preview {
+  background: var(--color-surface);
+}
+
+html.dark .share-cert-mini {
+  background: var(--color-white);
+}
+
+html.dark .info-box {
+  background: rgba(59, 130, 246, 0.1);
+  border-right-color: #60a5fa;
+}
+
+html.dark .info-box-content p {
+  color: #93c5fd;
+}
+
+html.dark .person-card {
+  background: var(--color-surface);
+}
+
+html.dark hr {
+  border-color: var(--color-border);
+}
