@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OYA Hackathons ⚡ 24 שעות מרעיון למיזם</title>
+<meta name="description" content="ההאקתונים של OYA — 24 שעות של יזמות, קוד ואדרנלין. צוותי נוער בונים מיזם טכנולוגי מהרעיון ועד הבמה, בליווי מנטורים מהתעשייה. הביאו האקתון לבית הספר או לעיר שלכם.">
+<meta name="theme-color" content="#0B0B22">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2300D3E0'/%3E%3Cstop offset='1' stop-color='%23FF5C7C'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='26' fill='%230B0B22'/%3E%3Cpath d='M55 18L28 54h18l-4 28 30-40H54l1-24z' fill='url(%23g)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+/* Hackathon page runs dark-first */
+body.hack { background: var(--ink); color: #fff; }
+.hack .nav.scrolled { background: rgba(11,11,34,.72); box-shadow: 0 1px 0 rgba(255,255,255,.08); }
+.hack .nav.scrolled .brand, .hack .nav.scrolled .nav__links a { color: #fff; }
+.hack .nav.scrolled .nav__badge { background: rgba(255,255,255,.14); color: #fff; border-color: rgba(255,255,255,.22); }
+.hack .nav.scrolled .nav__toggle span, .hack .nav.scrolled .nav__toggle span::before, .hack .nav.scrolled .nav__toggle span::after { color: #fff; }
+.brand__tag { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: var(--grad-warm); color: #fff; margin-inline-start: 2px; }
+
+.hsection { padding: 92px 0; position: relative; }
+.hsection h2 { font-size: clamp(28px,4vw,46px); }
+.hlead { color: rgba(255,255,255,.72); font-size: clamp(17px,2vw,20px); max-width: 640px; }
+.center .hlead { margin-inline: auto; }
+.heyebrow { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:#fff; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); padding:7px 15px; border-radius:var(--r-full); margin-bottom:20px; }
+.heyebrow::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 12px var(--cyan); }
+
+/* HERO */
+.h-hero { position: relative; overflow: hidden; padding: calc(var(--nav-h) + 80px) 0 96px; text-align: center; }
+.h-hero__bg { position: absolute; inset: 0; z-index: 0; }
+.h-hero .blob-1 { width: 560px; height: 560px; background: var(--cyan); top: -180px; left: -140px; opacity: .30; }
+.h-hero .blob-2 { width: 520px; height: 520px; background: var(--coral); top: -120px; right: -160px; opacity: .38; }
+.h-hero .blob-3 { width: 420px; height: 420px; background: var(--indigo); bottom: -220px; left: 40%; opacity: .40; }
+.h-hero__grid { position:absolute; inset:0; opacity:.6;
+  background-image: linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size: 46px 46px; mask-image: radial-gradient(ellipse 70% 55% at 50% 25%,#000 40%,transparent 100%); }
+.h-hero__inner { position: relative; z-index: 2; max-width: 860px; margin-inline: auto; }
+.h-live { display:inline-flex; align-items:center; gap:9px; padding:8px 16px; border-radius:var(--r-full); background:rgba(255,92,124,.14); border:1px solid rgba(255,92,124,.35); font-weight:700; font-size:14px; margin-bottom:26px; }
+.h-live .pulse { width:9px; height:9px; border-radius:50%; background:var(--coral); box-shadow:0 0 0 0 rgba(255,92,124,.6); animation: pulse 1.8s infinite; }
+@keyframes pulse { 0%{ box-shadow:0 0 0 0 rgba(255,92,124,.55) } 70%{ box-shadow:0 0 0 12px rgba(255,92,124,0) } 100%{ box-shadow:0 0 0 0 rgba(255,92,124,0) } }
+.h-hero h1 { font-size: clamp(40px,7vw,78px); font-weight:900; line-height:1.02; letter-spacing:-.03em; }
+.h-hero h1 .zap { background: linear-gradient(120deg,var(--cyan),var(--sky),var(--coral)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.h-hero p { color: rgba(255,255,255,.78); font-size: clamp(17px,2.2vw,21px); max-width:600px; margin:24px auto 36px; }
+.h-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.h-counter { display:flex; gap:40px; justify-content:center; margin-top:56px; flex-wrap:wrap; }
+.h-counter b { font-family:var(--font-display); font-size:clamp(34px,5vw,52px); font-weight:900; letter-spacing:-.03em; display:block; background:linear-gradient(120deg,#fff,#bfe9ff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.h-counter span { color: rgba(255,255,255,.6); font-size:15px; font-weight:600; }
+
+/* surfaces */
+.hcard { background: rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1); border-radius: var(--r-lg); padding: 30px; transition: transform .3s, background .3s, border-color .3s; }
+.hcard:hover { transform: translateY(-8px); background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.2); }
+
+/* format grid */
+.hgrid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:52px; }
+.hcard__ico { width:56px; height:56px; border-radius:16px; display:grid; place-items:center; margin-bottom:18px; color:#fff; }
+.hcard h3 { font-size:20px; margin-bottom:10px; }
+.hcard p { color: rgba(255,255,255,.68); font-size:15.5px; }
+
+/* timeline */
+.timeline { max-width:760px; margin:56px auto 0; position:relative; padding-inline-start:34px; }
+.timeline::before { content:""; position:absolute; inset:6px auto 6px 0; right:9px; width:2px; background:linear-gradient(var(--cyan),var(--coral)); }
+.tl-item { position:relative; padding:0 0 34px; }
+.tl-item::before { content:""; position:absolute; right:-31px; top:4px; width:16px; height:16px; border-radius:50%; background:var(--ink); border:3px solid var(--cyan); box-shadow:0 0 12px rgba(0,211,224,.6); }
+.tl-time { font-weight:800; color:var(--cyan); font-size:15px; }
+.tl-item h3 { font-size:19px; margin:4px 0 4px; }
+.tl-item p { color:rgba(255,255,255,.66); font-size:15px; }
+
+/* tracks */
+.tracks { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-top:48px; }
+.track { border-radius:var(--r-lg); padding:26px 22px; position:relative; overflow:hidden; color:#fff; min-height:150px; display:flex; flex-direction:column; justify-content:flex-end; }
+.track h3 { font-size:19px; } .track p { font-size:13.5px; color:rgba(255,255,255,.85); margin-top:6px; }
+.track__emoji { font-size:30px; position:absolute; top:20px; right:22px; }
+
+/* past events */
+.events { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:52px; }
+.event { border-radius:var(--r-lg); overflow:hidden; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1); transition:transform .3s, border-color .3s; }
+.event:hover { transform:translateY(-8px); border-color:rgba(255,255,255,.22); }
+.event__img { height:150px; position:relative; }
+.event__img img { width:100%; height:100%; object-fit:cover; opacity:.85; }
+.event__img .badge-win { position:absolute; top:12px; right:12px; background:var(--grad-warm); color:#fff; font-weight:800; font-size:12px; padding:5px 11px; border-radius:var(--r-full); }
+.event__body { padding:22px; }
+.event__body h3 { font-size:18px; margin-bottom:8px; }
+.event__body p { color:rgba(255,255,255,.66); font-size:14.5px; }
+.event__meta { margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; }
+.event__meta span { font-size:12.5px; font-weight:700; color:rgba(255,255,255,.8); background:rgba(255,255,255,.08); padding:4px 10px; border-radius:var(--r-full); }
+
+/* prizes */
+.prizes { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:52px; }
+.prize { text-align:center; border-radius:var(--r-lg); padding:34px 26px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); }
+.prize__medal { font-size:44px; margin-bottom:14px; }
+.prize h3 { font-size:20px; } .prize p { color:rgba(255,255,255,.66); font-size:15px; margin-top:8px; }
+
+/* host CTA */
+.host { position:relative; overflow:hidden; border-radius:var(--r-xl); padding:8px; background:linear-gradient(120deg,var(--cyan),var(--indigo),var(--coral)); }
+.host__inner { background:var(--ink); border-radius:calc(var(--r-xl) - 8px); padding:56px 44px; text-align:center; }
+.host h2 { font-size:clamp(28px,4vw,44px); }
+.host p { color:rgba(255,255,255,.75); max-width:560px; margin:16px auto 30px; font-size:18px; }
+
+.hfaq { max-width:760px; margin:48px auto 0; }
+.faq-item { border-bottom:1px solid rgba(255,255,255,.1); }
+.faq-q { width:100%; text-align:right; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:22px 4px; font-weight:700; font-size:17.5px; color:#fff; }
+.faq-q .pm { flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.1); transition:transform .3s, background .3s; font-size:18px; }
+.faq-item.open .pm { transform:rotate(45deg); background:var(--grad-warm); }
+.faq-a { max-height:0; overflow:hidden; transition:max-height .35s ease; color:rgba(255,255,255,.68); font-size:15.5px; }
+.faq-a p { padding:0 4px 22px; }
+
+@media (max-width:960px){ .hgrid-3,.events,.prizes{ grid-template-columns:repeat(2,1fr);} .tracks{ grid-template-columns:repeat(2,1fr);} }
+@media (max-width:760px){ .hsection{ padding:64px 0;} .hgrid-3,.events,.prizes,.tracks{ grid-template-columns:1fr;} .host__inner{ padding:40px 22px;} .h-counter{ gap:26px;} }
+</style>
+</head>
+<body class="hack">
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="brand">
+      <svg class="brand__mark" viewBox="0 0 100 100" fill="none"><defs><linearGradient id="zg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00D3E0"/><stop offset="1" stop-color="#FF5C7C"/></linearGradient></defs><rect width="100" height="100" rx="26" fill="#14142E"/><path d="M55 18L28 54h18l-4 28 30-40H54l1-24z" fill="url(#zg)"/></svg>
+      OYA <span class="brand__tag">Hackathons</span>
+    </a>
+    <nav class="nav__links" id="navLinks">
+      <a href="#format">הפורמט</a>
+      <a href="#timeline">לוח זמנים</a>
+      <a href="#tracks">מסלולים</a>
+      <a href="#past">האקתונים</a>
+      <a href="#host">ארחו האקתון</a>
+      <a href="#faq">שאלות</a>
+    </nav>
+    <div class="nav__cta">
+      <a href="index.html" class="nav__badge">← לאתר OYA</a>
+      <a href="#host" class="btn btn-primary" style="padding:11px 20px">בואו נריץ אחד</a>
+      <button class="nav__toggle" id="navToggle" aria-label="תפריט"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="h-hero">
+  <div class="h-hero__bg">
+    <span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span>
+    <div class="h-hero__grid"></div>
+  </div>
+  <div class="container">
+    <div class="h-hero__inner">
+      <span class="h-live"><span class="pulse"></span> hackathon.oya.org.il · הנישה של האקתוני OYA</span>
+      <h1>24 שעות.<br>מרעיון <span class="zap">למיזם</span> ⚡</h1>
+      <p>ההאקתונים של OYA הם החוויה הכי אינטנסיבית ביזמות הצעירה. צוותי נוער בונים מיזם טכנולוגי מאפס — קוד, עיצוב, מודל עסקי ופיץ' — ועולים לבמה מול שופטים מהתעשייה.</p>
+      <div class="h-actions">
+        <a href="#host" class="btn btn-primary btn-lg">ארחו האקתון ⚡</a>
+        <a href="#past" class="btn btn-ghost btn-lg">האקתונים שהיו</a>
+      </div>
+      <div class="h-counter">
+        <div><b data-count="40" data-suffix="+">0</b><span>האקתונים הופקו</span></div>
+        <div><b data-count="24" data-suffix="ש'">0</b><span>מרעיון למצגת</span></div>
+        <div><b data-count="9.63">0</b><span>ציון מיזם מנצח</span></div>
+        <div><b data-count="100" data-suffix="%">0</b><span>אדרנלין</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMAT -->
+<section class="hsection" id="format">
+  <div class="container">
+    <div class="center reveal" style="max-width:680px;margin-inline:auto">
+      <span class="heyebrow">מה זה בכלל</span>
+      <h2>האקתון זה לא רק קוד — <span class="zap">זו יזמות בפעולה</span></h2>
+      <p class="hlead">מרתון יצירה קצר ואינטנסיבי שבו צוות אחד לוקח בעיה אמיתית והופך אותה לפתרון עובד. רב-תחומי, שיתופי, וממכר.</p>
+    </div>
+    <div class="hgrid-3">
+      <article class="hcard reveal"><div class="hcard__ico bg-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="26" height="26"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div><h3>אינטנסיבי</h3><p>שעות ספורות של פוקוס מלא — לחץ בריא שמוציא מהמשתתפים יצירתיות שלא ידעו שיש בהם.</p></article>
+      <article class="hcard reveal"><div class="hcard__ico bg-coral"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="26" height="26"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><h3>עבודת צוות</h3><p>מפתחים, מעצבים ומספרי סיפורים — כל אחד תורם את החוזק שלו למטרה משותפת אחת.</p></article>
+      <article class="hcard reveal"><div class="hcard__ico bg-violet"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="26" height="26"><path d="M12 15a7 7 0 100-14 7 7 0 000 14z"/><path d="M8.2 13.9L7 23l5-3 5 3-1.2-9.1"/></svg></div><h3>ליווי מנטורים</h3><p>מנטורים מ-Monday.com, אינטל ובוגרי 8200 מלווים את הצוותים — ידע אמיתי מהתעשייה.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="hsection" id="timeline" style="background:rgba(255,255,255,.02)">
+  <div class="container">
+    <div class="center reveal" style="max-width:640px;margin-inline:auto">
+      <span class="heyebrow">שעה אחר שעה</span>
+      <h2>מסע ההאקתון</h2>
+    </div>
+    <div class="timeline">
+      <div class="tl-item reveal"><div class="tl-time">שעה 0 · Kickoff</div><h3>פתיחה והשראה</h3><p>הרצאת פתיחה, הצגת האתגר, והכרת חוקי המשחק. האנרגיה עולה.</p></div>
+      <div class="tl-item reveal"><div class="tl-time">שעה 1 · Teams</div><h3>הרכבת צוותים ורעיונות</h3><p>סבב סיעור מוחות מהיר, בחירת הרעיון החזק והתגבשות לצוותים.</p></div>
+      <div class="tl-item reveal"><div class="tl-time">שעות 2–18 · Build</div><h3>בונים בלי הפסקה</h3><p>פרוטוטייפ, מודל עסקי, עיצוב — עם תחנות מנטורינג לאורך הדרך.</p></div>
+      <div class="tl-item reveal"><div class="tl-time">שעה 20 · Pitch Prep</div><h3>מלטשים את הפיץ'</h3><p>בונים מצגת, מתאמנים על ההצגה, ומחדדים את הסיפור שמוכר את החזון.</p></div>
+      <div class="tl-item reveal"><div class="tl-time">שעה 24 · Demo Day</div><h3>עולים לבמה</h3><p>כל צוות מציג מול חבר שופטים מהתעשייה. משוב, ציונים — והכתרת המנצחים.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRACKS -->
+<section class="hsection" id="tracks">
+  <div class="container">
+    <div class="center reveal" style="max-width:640px;margin-inline:auto">
+      <span class="heyebrow">מסלולי אתגר</span>
+      <h2>בחרו את הזירה שלכם</h2>
+      <p class="hlead">כל האקתון מתמקד באתגרים אמיתיים. אלה המסלולים שהצוותים שלנו הכי אוהבים.</p>
+    </div>
+    <div class="tracks">
+      <div class="track reveal" style="background:linear-gradient(150deg,var(--indigo),var(--violet))"><span class="track__emoji">🎓</span><h3>EdTech</h3><p>טכנולוגיה שמשנה את הלמידה</p></div>
+      <div class="track reveal" style="background:linear-gradient(150deg,var(--coral),#ff9a6b)"><span class="track__emoji">❤️</span><h3>בריאות ורווחה</h3><p>מ-Calmloop ועד wellbeing</p></div>
+      <div class="track reveal" style="background:linear-gradient(150deg,var(--sky),var(--cyan))"><span class="track__emoji">🌍</span><h3>קיימות ועיר חכמה</h3><p>פתרונות לעתיד היישוב</p></div>
+      <div class="track reveal" style="background:linear-gradient(150deg,#10B981,#5eded0)"><span class="track__emoji">🛡️</span><h3>אימפקט חברתי</h3><p>MoveTeen ומניעת בריונות</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PAST EVENTS -->
+<section class="hsection" id="past" style="background:rgba(255,255,255,.02)">
+  <div class="container">
+    <div class="center reveal" style="max-width:640px;margin-inline:auto">
+      <span class="heyebrow">מהשטח</span>
+      <h2>האקתונים שכבר עשינו</h2>
+    </div>
+    <div class="events">
+      <article class="event reveal">
+        <div class="event__img"><img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=700&q=80" alt="האקתון יצחק שמיר"><span class="badge-win">🏆 מיזם מנצח 9.63</span></div>
+        <div class="event__body"><h3>האקתון יצחק שמיר · פ״ת</h3><p>שכבה ט' פיתחה מיזמים טכנולוגיים בליווי מנטורים. המנצח: Calmloop — אפליקציה לניהול מתח וחרדה לנוער.</p><div class="event__meta"><span>פתח תקווה</span><span>שכבה ט'</span><span>יזמות</span></div></div>
+      </article>
+      <article class="event reveal">
+        <div class="event__img"><img src="https://images.unsplash.com/photo-1559223607-a43c990c692c?w=700&q=80" alt="אליפות יבנה 2050"></div>
+        <div class="event__body"><h3>אליפות סטארטאפים · יבנה 2050</h3><p>אליפות עירונית בשיתוף עיריית יבנה — צוותים הציגו מיזמים לעתיד העיר בחינוך, תחבורה וסביבה.</p><div class="event__meta"><span>יבנה</span><span>עירוני</span><span>עתיד העיר</span></div></div>
+      </article>
+      <article class="event reveal">
+        <div class="event__img"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=700&q=80" alt="סדנת MoveTeen"></div>
+        <div class="event__body"><h3>MoveTeen · נהריה</h3><p>"רואים. מדברים. עוצרים." — האקתון חברתי למניעת אלימות ובריונות ברשתות החברתיות.</p><div class="event__meta"><span>נהריה</span><span>חברתי</span><span>MoveTeen</span></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PRIZES -->
+<section class="hsection" id="prizes">
+  <div class="container">
+    <div class="center reveal" style="max-width:640px;margin-inline:auto">
+      <span class="heyebrow">מה מרוויחים</span>
+      <h2>הרבה מעבר לפרס</h2>
+      <p class="hlead">כי החוויה, הביטחון והרשת האנושית שווים יותר מכל גביע.</p>
+    </div>
+    <div class="prizes">
+      <div class="prize reveal"><div class="prize__medal">🥇</div><h3>הכתרה ובמה</h3><p>המיזמים המובילים זוכים להכרה, לתעודות ולחשיפה מול התעשייה והרשות.</p></div>
+      <div class="prize reveal"><div class="prize__medal">🚀</div><h3>המשך ליווי</h3><p>הרעיונות המבטיחים ממשיכים למרכזי היזמות ולתוכניות ההמשך של OYA.</p></div>
+      <div class="prize reveal"><div class="prize__medal">🤝</div><h3>רשת וקשרים</h3><p>מפגש עם מנטורים, אנשי מוצר ויזמים — קשרים שפותחים דלתות בהמשך.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOST CTA -->
+<section class="hsection" id="host">
+  <div class="container">
+    <div class="host reveal">
+      <div class="host__inner">
+        <span class="heyebrow">לבתי ספר · רשויות · חברות</span>
+        <h2>ארחו האקתון OYA משלכם</h2>
+        <p>אנחנו מביאים את הכל — פורמט, מנחים, מנטורים, מיתוג ולוגיסטיקה. אתם מביאים את הנוער והאנרגיה. בואו נריץ יחד את ההאקתון הבא.</p>
+        <div class="h-actions">
+          <a href="mailto:hackathon@oya.org.il" class="btn btn-primary btn-lg">hackathon@oya.org.il</a>
+          <a href="index.html#contact" class="btn btn-ghost btn-lg">לכל התוכניות של OYA</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="hsection" id="faq" style="background:rgba(255,255,255,.02)">
+  <div class="container">
+    <div class="center reveal" style="max-width:640px;margin-inline:auto">
+      <span class="heyebrow">שאלות נפוצות</span>
+      <h2>כל מה שרציתם לדעת</h2>
+    </div>
+    <div class="hfaq">
+      <div class="faq-item reveal"><button class="faq-q">לאיזה גיל מיועדים ההאקתונים? <span class="pm">+</span></button><div class="faq-a"><p>מכיתות ז' ומעלה — עם התאמת האתגר, הקצב והליווי לכל שכבת גיל, מחטיבת הביניים ועד התיכון.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">צריך לדעת לתכנת כדי להשתתף? <span class="pm">+</span></button><div class="faq-a"><p>ממש לא. האקתון הוא רב-תחומי — יש מקום למעצבים, למספרי סיפורים, לחוקרים וליזמים. הקוד הוא רק חלק אחד מהפאזל.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">כמה זמן זה לוקח להפיק? <span class="pm">+</span></button><div class="faq-a"><p>האקתון עצמו נמשך בין יום מרוכז ל-24 שעות. את ההפקה אנחנו מובילים איתכם על פני מספר שבועות של תיאום מראש.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">איפה זה מתקיים? <span class="pm">+</span></button><div class="faq-a"><p>בבית הספר, במרכז קהילתי, באשכול פיס או במשרדי חברת הייטק שותפה — כל מרחב שמאפשר חוויה מרוכזת ומרגשת.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">כמה זה עולה? <span class="pm">+</span></button><div class="faq-a"><p>העלות תלויה בהיקף, במספר המשתתפים ובמודל השותפות. פנו אלינו ונבנה יחד הצעה שמתאימה לתקציב שלכם.</p></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">
+          <svg width="36" height="36" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="26" fill="#1E1E44"/><path d="M55 18L28 54h18l-4 28 30-40H54l1-24z" fill="url(#zg)"/></svg>
+          OYA Hackathons
+        </div>
+        <p>24 שעות מרעיון למיזם. הנישה של האקתוני OYA — חלק מעולם היזמות הצעירה של OYA.</p>
+      </div>
+      <div>
+        <h4>ההאקתון</h4>
+        <ul><li><a href="#format">הפורמט</a></li><li><a href="#timeline">לוח זמנים</a></li><li><a href="#tracks">מסלולים</a></li><li><a href="#past">האקתונים שהיו</a></li></ul>
+      </div>
+      <div>
+        <h4>OYA</h4>
+        <ul><li><a href="index.html">האתר הראשי</a></li><li><a href="index.html#programs">תוכניות</a></li><li><a href="index.html#team">הצוות</a></li></ul>
+      </div>
+      <div>
+        <h4>צרו קשר</h4>
+        <ul><li><a href="mailto:hackathon@oya.org.il">hackathon@oya.org.il</a></li><li><a href="https://hackathon.oya.org.il">hackathon.oya.org.il</a></li></ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 OYA · יזמות צעירה. כל הזכויות שמורות.</span>
+      <span><a href="index.html" style="color:var(--cyan)">← חזרה לאתר OYA</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
